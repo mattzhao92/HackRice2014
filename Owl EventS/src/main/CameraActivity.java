@@ -71,7 +71,7 @@ public class CameraActivity extends Activity {
 				fis.read(bytes);
 				Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0,
 						bytes.length);
-				Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 640, 480, true);
+				Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 480, 320, true);
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				resizedBitmap.compress(Bitmap.CompressFormat.PNG, 80, stream);
 				byte[] byteArray = stream.toByteArray();
