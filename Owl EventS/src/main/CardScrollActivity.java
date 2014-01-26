@@ -2,15 +2,19 @@ package main;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.android.glass.sample.compass.R;
-import com.google.android.glass.widget.CardScrollView;
 
+import lib.EventFetcher;
+import location.Event;
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.glass.app.*;
-import com.google.android.glass.widget.*;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.glass.app.Card;
+import com.google.android.glass.sample.compass.R;
+import com.google.android.glass.widget.CardScrollAdapter;
+import com.google.android.glass.widget.CardScrollView;
 
 public class CardScrollActivity extends Activity {
 
@@ -24,7 +28,7 @@ public class CardScrollActivity extends Activity {
         createCards();
 
         mCardScrollView = new CardScrollView(this);
-        ExampleCardScrollAdapter adapter = new ExampleCardScrollAdapter();
+        GalleryCardScrollAdapter adapter = new GalleryCardScrollAdapter();
         mCardScrollView.setAdapter(adapter);
         mCardScrollView.activate();
         setContentView(mCardScrollView);
@@ -32,9 +36,25 @@ public class CardScrollActivity extends Activity {
 
     private void createCards() {
         mCards = new ArrayList<Card>();
+        
+        List<Event> events = ARView.owlevents;
 
         Card card;
-
+        EventFetcher ef = new EventFetcher(getApplicationContext());
+        for (Event event : events) {
+        	List<String> photos = event.getGallery();
+        	if (!photos.isEmpty()) {
+        		for (String photo : photos) {
+        			card = new Card(this);
+        			card.setImageLayout(Card.ImageLayout.FULL);
+        			System.out.println(photo);
+        			ef.getFile(photo);
+        			mCards.add(card);
+        		}
+        		break;
+        	} 
+        }
+        
         card = new Card(this);
         card.setText("This card has a footer.");
         card.setFootnote("I'm the footer!");
@@ -57,7 +77,7 @@ public class CardScrollActivity extends Activity {
         mCards.add(card);
     }
 
-    private class ExampleCardScrollAdapter extends CardScrollAdapter {
+    private class GalleryCardScrollAdapter extends CardScrollAdapter {
 
         @Override
         public int findIdPosition(Object id) {

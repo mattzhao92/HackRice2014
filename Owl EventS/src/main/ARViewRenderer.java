@@ -213,4 +213,8 @@ public class ARViewRenderer implements DirectRenderingCallback {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public List<Event> getEvents() {
+		return mCompassView.getEvents();
+	}
 }

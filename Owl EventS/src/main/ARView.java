@@ -60,7 +60,7 @@ public class ARView extends View {
     private final ValueAnimator mAnimator;
     private EventFetcher eventFetcher;
     private OrientationManager mOrientation;
-    private List<Event> owlevents;
+    public static List<Event> owlevents;
 
 
     private Timer timer = new Timer();
@@ -73,7 +73,7 @@ public class ARView extends View {
         this(context, attrs, 0);
     }
 
-    public ARView(Context context, AttributeSet attrs, int defStyle) {
+    public ARView(final Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         owlevents = new ArrayList<Event>();
@@ -91,7 +91,7 @@ public class ARView extends View {
         mAnimatedHeading = Float.NaN;
 
         mAnimator = new ValueAnimator();
-        eventFetcher = new EventFetcher();
+        eventFetcher = new EventFetcher(context);
         eventFetcher.getAllEvents(owlevents);
         timer.schedule(new TimerTask() {
 			
@@ -212,7 +212,7 @@ public class ARView extends View {
                 // If the distance to the destination angle is small enough (or if this is the
                 // first time the compass is being displayed), it will be more fluid to just redraw
                 // immediately instead of doing an animation.
-            	System.out.println("LOG heading data: "+end);
+//            	System.out.println("LOG heading data: "+end);
                 mAnimatedHeading = end;
                 invalidate();
             } else {
@@ -234,5 +234,9 @@ public class ARView extends View {
                 mAnimator.start();
             }
         }
+    }
+    
+    public List<Event> getEvents() {
+    	return owlevents;
     }
 }

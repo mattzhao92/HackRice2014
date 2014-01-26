@@ -107,7 +107,6 @@ public class MenuActivity extends Activity {
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);
-
         unbindService(mConnection);
         finish();
     }

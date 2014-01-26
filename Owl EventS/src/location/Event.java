@@ -33,13 +33,13 @@ public class Event {
     private final Bitmap creatorPicture;
     private final double latitude;
     private final double longitude;
-    private final List<Bitmap> gallery;
+    private final List<String> gallery;
     
     
 
     public Event(String id, String name, String detail, String creatorName,
 			Bitmap creatorPicture, double latitude, double longitude,
-			List<Bitmap> gallery) {
+			List<String> gallery) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -66,4 +66,22 @@ public class Event {
     public String getName() {
         return name;
     }
+
+	public String getId() {
+		return id;
+	}
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public String getCreatorName() {
+		return creatorName;
+	}
+
+	public List<String> getGallery() {
+		return gallery;
+	}
+    
+    
 }
