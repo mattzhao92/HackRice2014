@@ -64,7 +64,9 @@ public class ARView extends View {
 
     public ARView(final Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
+        this.setBackgroundColor(Color.DKGRAY);
+        this.invalidate();
+        
         owlevents = new ArrayList<Event>();
 
         loadingTextPaint = new TextPaint();
@@ -73,7 +75,9 @@ public class ARView extends View {
         loadingTextPaint.setColor(Color.WHITE);
         loadingTextPaint.setTextSize(LOADING_TEXT_SIZE);
         
+        Typeface tf = Typeface.create("Helvetica",Typeface.BOLD);
         eventTextPaint = new TextPaint();
+        eventTextPaint.setTypeface(tf);
         eventTextPaint.setStyle(Paint.Style.FILL);
         eventTextPaint.setAntiAlias(true);
         eventTextPaint.setColor(Color.BLACK);
@@ -125,6 +129,7 @@ public class ARView extends View {
         }
     	canvas.restore();       
     }
+   
     
     
     private void drawLoading(Canvas canvas) {
@@ -177,6 +182,25 @@ public class ARView extends View {
     	}
     }
     
+    private Rect mBounds = new Rect();
+    void drawMultilineText(Canvas canvas, String str, int x, int y, Paint paint) {
+        int      lineHeight = 0;
+        int      yoffset    = 0;
+        String[] lines      = str.split("\n");
+
+        paint.getTextBounds("Ig", 0, 2, mBounds);
+        lineHeight = (int) ((float) mBounds.height() * 1.2);
+        
+        for (int i = 0; i < Math.min(3,lines.length); ++i) {
+        	if (i == 0)
+        		paint.setTextSize(40);
+            canvas.drawText(lines[i], x, y + yoffset, paint);
+            yoffset = yoffset + lineHeight;
+            if (i == 0) 
+            	paint.setTextSize(EVENT_TEXT_SIZE);
+        }
+    }
+    
     private void drawEvents(Canvas canvas, float pixelsPerCard, float offset) {
         if (mOrientation.hasLocation() && owlevents != null) {
                 Location userLocation = mOrientation.getLocation();
@@ -195,19 +219,20 @@ public class ARView extends View {
                     int fy = -320/2;
                     
                     //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
-                    drawEvent(canvas, fx, fy, place.getName(), place.getCreatorName(), place.getDetail(), place.getCreatorPicture(), eventTextPaint);
+                    drawEvent(canvas, fx, fy, "Me have a sandwd \nAnd I have a babldd", place.getCreatorName(), "This is a detail, \na detail is what it\nAnother line here", place.getCreatorPicture(), eventTextPaint);
                 }
         }
     }
     
     private void drawEvent(Canvas canvas, int offsetX, int offsetY, 
     					   String textUpperRight, String textLowerLeft,
-    					   String textLowerRight, Bitmap profile_picture, Paint eventTextPaint) {
+    					   String textMiddleRight, Bitmap profile_picture, Paint eventTextPaint) {
     	
+    	drawMultilineText(canvas, textUpperRight, (int) (offsetX+560 *(1-vertical_ratio)), (int)(320 * 0.2) + offsetY,eventTextPaint);
+    	drawMultilineText(canvas, textMiddleRight, (int) (offsetX+560 *(1-vertical_ratio)), (int)(320 * 0.55) + offsetY,eventTextPaint);
     	
-        canvas.drawText(textUpperRight,(float) (offsetX+560 *(1-vertical_ratio)), (int)(320 * (1-horizontal_ratio)) + offsetY,eventTextPaint);
-        canvas.drawText(textLowerRight,(float) (offsetX+560 *(1-vertical_ratio)), (int)(320 * (horizontal_ratio)) + offsetY,eventTextPaint);
-        canvas.drawText(textLowerLeft,offsetX,(int) (320 * (horizontal_ratio) + offsetY), eventTextPaint);
+        // canvas.drawText(textMiddleRight,(int) (offsetX+560 *(1-vertical_ratio)), (int)(320 * (horizontal_ratio)) + offsetY,eventTextPaint);
+        canvas.drawText(textLowerLeft, (int) (offsetX + 560 * 0.12),(int) (320 * (horizontal_ratio) + offsetY), eventTextPaint);
         // draw the bitmap from the drawingcache to the canvas
         canvas.drawBitmap(profile_picture, offsetX+EVENT_PICTURE_OFFSETX, offsetY+EVENT_PICTURE_OFFSETY, eventTextPaint);
     }
@@ -250,6 +275,8 @@ public class ARView extends View {
         mHeading = Utils.mod(degrees, 360.0f);
         animateTo(mHeading);
     }
+    
+    
     
     private void animateTo(float end) {
         if (!mAnimator.isRunning()) {
