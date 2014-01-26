@@ -27,6 +27,7 @@ public class EventFetcher {
 	public static final String EVENT_NAME = "name";
 	public static final String EVENT_LOCATION = "location";
 	public static final String EVENT_DETAIL = "detail";
+	public static final String EVENT_STORY = "story";
 	public static final String CREATOR_PROFILE = "creator";
 	public static final String CREATOR_PICTURE = "picture";
 	public static final String CREATOR_NAME = "name";
@@ -68,6 +69,7 @@ public class EventFetcher {
 									event.getString(EVENT_NAME), 
 									event.getString(EVENT_DETAIL), 
 									creator.getString(CREATOR_NAME),
+									event.getString(EVENT_STORY),
 									picture, point.getLatitude(), 
 									point.getLongitude(), 
 									gallery);

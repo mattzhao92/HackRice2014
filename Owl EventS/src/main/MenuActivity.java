@@ -102,12 +102,15 @@ public class MenuActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+    	Intent intent;
         switch (item.getItemId()) {
             case R.id.view_summary:
                 //mCompassService.readHeadingAloud();
+            	intent = new Intent(MenuActivity.this, SummaryActivity.class);
+            	startActivity(intent);
                 return true;
             case R.id.view_gallery:
-            	Intent intent = new Intent(MenuActivity.this, CardScrollActivity.class);
+            	intent = new Intent(MenuActivity.this, CardScrollActivity.class);
             	startActivity(intent);
                 return true;
             case R.id.give_direction:

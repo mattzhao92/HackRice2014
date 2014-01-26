@@ -30,20 +30,23 @@ public class Event {
     private final String name;
     private final String detail;
     private final String creatorName;
+    private final String story;
     private final Bitmap creatorPicture;
     private final double latitude;
     private final double longitude;
     private final List<String> gallery;
     private List<String> reviews;
 
-    public Event(String id, String name, String detail, String creatorName,
-			Bitmap creatorPicture, double latitude, double longitude,
-			List<String> gallery) {
+
+	public Event(String id, String name, String detail, String creatorName,
+			String story, Bitmap creatorPicture, double latitude,
+			double longitude, List<String> gallery) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.detail = detail;
 		this.creatorName = creatorName;
+		this.story = story;
 		this.creatorPicture = creatorPicture;
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -88,6 +91,10 @@ public class Event {
 
 	public void setReviews(List<String> reviews) {
 		this.reviews = reviews;
+	}
+
+	public String getStory() {
+		return story;
 	}
 
     
