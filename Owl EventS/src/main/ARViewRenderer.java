@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import location.Landmarks;
 import location.OrientationManager;
-import location.Place;
+import location.Event;
 
 public class ARViewRenderer implements DirectRenderingCallback {
 
@@ -67,9 +67,9 @@ public class ARViewRenderer implements DirectRenderingCallback {
         @Override
         public void onLocationChanged(OrientationManager orientationManager) {
             Location location = orientationManager.getLocation();
-            List<Place> places = mLandmarks.getNearbyLandmarks(
+            List<Event> places = mLandmarks.getNearbyLandmarks(
                     location.getLatitude(), location.getLongitude());
-            mCompassView.setNearbyPlaces(places);
+            //mCompassView.setNearbyPlaces(places);
         }
 
         @Override
@@ -107,9 +107,9 @@ public class ARViewRenderer implements DirectRenderingCallback {
 
         if (mOrientationManager.hasLocation()) {
             Location location = mOrientationManager.getLocation();
-            List<Place> nearbyPlaces = mLandmarks.getNearbyLandmarks(
+            List<Event> nearbyPlaces = mLandmarks.getNearbyLandmarks(
                     location.getLatitude(), location.getLongitude());
-            mCompassView.setNearbyPlaces(nearbyPlaces);
+            //mCompassView.setNearbyPlaces(nearbyPlaces);
         }
 
         mRenderThread = new RenderThread();

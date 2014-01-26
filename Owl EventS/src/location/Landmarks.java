@@ -50,14 +50,14 @@ public class Landmarks {
     /**
      * The list of landmarks loaded from resources.
      */
-    private final ArrayList<Place> mPlaces;
+    private final ArrayList<Event> mPlaces;
 
     /**
      * Initializes a new {@code Landmarks} object by loading the landmarks from the resource
      * bundle.
      */
     public Landmarks(Context context) {
-        mPlaces = new ArrayList<Place>();
+        mPlaces = new ArrayList<Event>();
 
         // This class will be instantiated on the service's main thread, and doing I/O on the
         // main thread can be dangerous if it will block for a noticeable amount of time. In
@@ -73,10 +73,10 @@ public class Landmarks {
      * function will never return null; if there are no locations within that threshold, then an
      * empty list will be returned.
      */
-    public List<Place> getNearbyLandmarks(double latitude, double longitude) {
-        ArrayList<Place> nearbyPlaces = new ArrayList<Place>();
+    public List<Event> getNearbyLandmarks(double latitude, double longitude) {
+        ArrayList<Event> nearbyPlaces = new ArrayList<Event>();
 
-        for (Place knownPlace : mPlaces) {
+        for (Event knownPlace : mPlaces) {
             if (Utils.getDistance(latitude, longitude,
                     knownPlace.getLatitude(), knownPlace.getLongitude()) <= MAX_DISTANCE_KM) {
                 nearbyPlaces.add(knownPlace);
@@ -99,7 +99,7 @@ public class Landmarks {
             if (array != null) {
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject object = array.optJSONObject(i);
-                    Place place = jsonObjectToPlace(object);
+                    Event place = jsonObjectToPlace(object);
                     if (place != null) {
                         mPlaces.add(place);
                     }
@@ -111,18 +111,19 @@ public class Landmarks {
     }
 
     /**
-     * Converts a JSON object that represents a place into a {@link Place} object.
+     * Converts a JSON object that represents a place into a {@link Event} object.
      */
-    private Place jsonObjectToPlace(JSONObject object) {
-        String name = object.optString("name");
-        double latitude = object.optDouble("latitude", Double.NaN);
-        double longitude = object.optDouble("longitude", Double.NaN);
-
-        if (!name.isEmpty() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-            return new Place(latitude, longitude, name);
-        } else {
-            return null;
-        }
+    private Event jsonObjectToPlace(JSONObject object) {
+//        String name = object.optString("name");
+//        double latitude = object.optDouble("latitude", Double.NaN);
+//        double longitude = object.optDouble("longitude", Double.NaN);
+//
+//        if (!name.isEmpty() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+//            return new Event(latitude, longitude, name);
+//        } else {
+//            return null;
+//        }
+    	return null;
     }
 
     /**

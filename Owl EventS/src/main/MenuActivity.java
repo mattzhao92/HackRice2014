@@ -56,8 +56,8 @@ public class MenuActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bindService(new Intent(this, EventService.class), mConnection, 0);
         Parse.initialize(this, "FiJwGLjq2YlT3ZNS0XR0l4stnsoTznGyBtPGtNQq", "spVdi98WR76oqNwxF2opcyIXa2yo0Oysl3I4zpA6");
+        bindService(new Intent(this, EventService.class), mConnection, 0);
     }
 
     @Override

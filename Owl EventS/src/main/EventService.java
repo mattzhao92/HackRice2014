@@ -20,6 +20,7 @@ import com.google.android.glass.sample.compass.R;
 import com.google.android.glass.timeline.LiveCard;
 import com.google.android.glass.timeline.LiveCard.PublishMode;
 import com.google.android.glass.timeline.TimelineManager;
+import com.parse.Parse;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -56,7 +57,7 @@ public class EventService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        Parse.initialize(this, "FiJwGLjq2YlT3ZNS0XR0l4stnsoTznGyBtPGtNQq", "spVdi98WR76oqNwxF2opcyIXa2yo0Oysl3I4zpA6");
         mTimelineManager = TimelineManager.from(this);
         mOrientationManager = new OrientationManager((SensorManager) getSystemService(Context.SENSOR_SERVICE), 
         											 (LocationManager) getSystemService(Context.LOCATION_SERVICE));

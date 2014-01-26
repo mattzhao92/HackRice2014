@@ -4,14 +4,19 @@ package lib;
 import java.util.ArrayList;
 import java.util.List;
 
+import location.Event;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.widget.ImageView;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -30,25 +35,34 @@ public class EventFetcher {
 	public static final String GALLERY_PHOTO = "photo";
 
 	
-	public void getAllEvents(final ImageView iv) {
+	public void getAllEvents(final List<Event> collection) {
 		ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("Event");
 		eventQuery.findInBackground(new FindCallback<ParseObject>() {
-			
 			@Override
 			public void done(List<ParseObject> events, ParseException e) {
-				for (ParseObject event : events) {
+				collection.clear();
+				for (final ParseObject event : events) {
 					final ParseObject creator = event.getParseObject(CREATOR_PROFILE);
 					// Fetch the related user profiles.
 					creator.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
 						@Override
 						public void done(ParseObject object, ParseException e) {
-//							System.out.println(creator);
-//							System.out.println(creator.getString(CREATOR_NAME));
+							System.out.println(creator.getString(CREATOR_NAME));
 							// Download the profile picture.
-//							ParseFile pic = creator.getParseFile(CREATOR_PICTURE);
-//							Bitmap bitmap = parseFileToBitmap(pic);
-//							iv.setImageBitmap(bitmap);
-//							getEventPhotoGallery(event.ge)
+							ParseFile pic = creator.getParseFile(CREATOR_PICTURE);
+							Bitmap picture = parseFileToBitmap(pic);
+							ParseGeoPoint point = (ParseGeoPoint)event.get(EVENT_LOCATION);
+							List<Bitmap> gallery = getEventPhotoGallery(event.getObjectId());
+							Event newEvent = new Event(event.getObjectId(),
+									event.getString(EVENT_NAME),
+									event.getString(EVENT_DETAIL),
+									event.getString(creator.getString(CREATOR_NAME)),
+									picture,
+									point.getLatitude(),
+									point.getLongitude(),
+									gallery);
+							
+							collection.add(newEvent);
 						}
 					});
 				}
@@ -88,23 +102,14 @@ public class EventFetcher {
 		return bitmap;
 	}
 	
-	public void uploadPic(String event) {
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
-		query.getInBackground("omFao4nmfv", new GetCallback<ParseObject>() {
-			@Override
-			public void done(final ParseObject eve, ParseException e) {
-				
-				ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Profile");
-				query2.getInBackground("kzFEajftY1", new GetCallback<ParseObject>() {
-					@Override
-					public void done(ParseObject object, ParseException e) {
-						eve.put(CREATOR_PROFILE, object);
-						eve.saveInBackground();
-					}
-				});
-			}
-		});
+	
+	public void uploadGalleryPicture(String eventId, byte[] photoByte, String photoName) {
+		ParseObject photo = new ParseObject("Gallery");
+		ParseFile file = new ParseFile(photoName, photoByte);
+		file.saveInBackground();
+		// Associate the photo with the data.
+		photo.put(GALLERY_PHOTO, photo);
+		photo.put(GALLERY_EVENT_ID, eventId);
+		photo.saveInBackground();
 	}
-	
-	
 }

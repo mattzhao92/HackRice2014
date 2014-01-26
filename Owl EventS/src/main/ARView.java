@@ -28,15 +28,20 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import lib.EventFetcher;
 import lib.Utils;
 import location.OrientationManager;
-import location.Place;
+import location.Event;
 
 
 public class ARView extends View {
@@ -63,14 +68,19 @@ public class ARView extends View {
     private float mAnimatedHeading;
 
     private OrientationManager mOrientation;
-    private List<Place> mNearbyPlaces;
+    private List<Event> mNearbyPlaces;
 
     private final Paint mPaint;
     private final TextPaint mPlacePaint;
     private final List<Rect> mAllBounds;
     private final NumberFormat mDistanceFormat;
     private final ValueAnimator mAnimator;
+    private final Context mcontext;
+    
+    private EventFetcher eventFetcher;
 
+    private Timer timer = new Timer();
+    
     public ARView(Context context) {
         this(context, null, 0);
     }
@@ -82,6 +92,7 @@ public class ARView extends View {
     public ARView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
+        this.mNearbyPlaces = new ArrayList<Event>();
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setAntiAlias(true);
@@ -106,15 +117,20 @@ public class ARView extends View {
         mAnimatedHeading = Float.NaN;
 
         mAnimator = new ValueAnimator();
+        eventFetcher = new EventFetcher();
+        eventFetcher.getAllEvents(mNearbyPlaces);
+        timer.schedule(new TimerTask() {
+			
+ 			@Override
+ 			public void run() {
+ 				eventFetcher.getAllEvents(mNearbyPlaces);
+ 			}
+ 		}, 1000, 25000);
+        this.mcontext = context;
         setupAnimator();
     }
 
-    /**
-     * Sets the instance of {@link OrientationManager} that this view will use to get the current
-     * heading and location.
-     *
-     * @param orientationManager the instance of {@code OrientationManager} that this view will use
-     */
+  
     public void setOrientationManager(OrientationManager orientationManager) {
         mOrientation = orientationManager;
     }
@@ -135,10 +151,6 @@ public class ARView extends View {
     }
 
  
-    public void setNearbyPlaces(List<Place> places) {
-        mNearbyPlaces = places;
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -156,14 +168,14 @@ public class ARView extends View {
         // draw them three times; once to the left, once at the "true" bearing, and once to the
         // right.
         for (int i = -1; i <= 1; i++) {
-            drawPlaces(canvas, pixelsPerDegree, i * pixelsPerDegree * 360);
+            drawEvents(canvas, pixelsPerDegree, i * pixelsPerDegree * 360);
         }
 
         canvas.restore();
     }
-
+    
   
-    private void drawPlaces(Canvas canvas, float pixelsPerDegree, float offset) {
+    private void drawEvents(Canvas canvas, float pixelsPerDegree, float offset) {
         if (mOrientation.hasLocation() && mNearbyPlaces != null) {
             synchronized (mNearbyPlaces) {
                 Location userLocation = mOrientation.getLocation();
@@ -172,12 +184,11 @@ public class ARView extends View {
 
                 mAllBounds.clear();
 
-                // Loop over the list of nearby places (those within 10 km of the user's current
-                // location), and compute the relative bearing from the user's location to the
-                // place's location. This determines the position on the compass view where the
-                // pin will be drawn.
                 int place_index = 0;
-                for (Place place : mNearbyPlaces) {
+                
+                System.out.println("Size of Nearby Places : "+mNearbyPlaces.size());
+                ArrayList<Event> eventsCopy = new ArrayList<Event>(mNearbyPlaces);
+                for (Event place : eventsCopy) {
                     double latitude2 = place.getLatitude();
                     double longitude2 = place.getLongitude();
                     float bearing = Utils.getBearing(latitude1, longitude1, latitude2,
@@ -186,23 +197,95 @@ public class ARView extends View {
                     int fx = (int) (offset + bearing * pixelsPerDegree
                             - PLACE_PIN_WIDTH / 2);
                     int fy = -160;
-                    //canvas.drawRect(fx, fy, fx+150, fy+150, mPlacePaint);
                     
-                    System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
-                    Rect rect = new Rect(fx,fy,fx+560,fy+320);
+                    //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
+                    //Rect rect = new Rect(fx,fy,fx+560,fy+320);
 
-                    RectF rectF = new RectF(rect);
+                    //RectF rectF = new RectF(rect);
                     
-                    canvas.drawRoundRect(rectF, 40, 40, mPlacePaint);
+                    //canvas.drawRoundRect(rectF, 40, 40, mPlacePaint);
+                    
+                    drawEvent(canvas, fx, "helloWorld", "helloWorld", "helloWorld", place.getCreatorPicture(), mPaint);
                 }
             }
         }
     }
 
-    /**
-     * Sets up a {@link ValueAnimator} that will be used to animate the compass
-     * when the distance between two sensor events is large.
-     */
+    
+    private static final double vertical_ratio = 0.5;
+    private static final double horizontal_ratio = 0.8;
+    
+    private void drawEvent(Canvas canvas, int offset, String textUpperRight, String textLowerLeft,
+    					   String textLowerRight, Bitmap profile_picture, Paint paint) {
+         //canvas.drawPaint(paint);
+    	  paint = new TextPaint();
+    	  paint.setStyle(Paint.Style.FILL);
+    	  paint.setAntiAlias(true);
+    	  paint.setColor(Color.WHITE);
+    	  paint.setTextSize(PLACE_TEXT_HEIGHT);
+    	  paint.setTypeface(Typeface.createFromFile(new File("/system/glass_fonts",
+                  "Roboto-Light.ttf")));
+          
+//        TextView upperRightView = new TextView(mcontext);
+//        TextView lowerRightView = new TextView(mcontext);
+//        TextView lowerLeftView = new TextView(mcontext);
+//        ImageView imageView = new ImageView(mcontext);
+//        
+//
+//        imageView.setImageBitmap(profile_picture);
+//        upperRightView.setText(textUpperRight);
+//        lowerRightView.setText(textLowerRight);
+//        lowerLeftView.setText(textLowerLeft);
+//        
+//        upperRightView.setDrawingCacheEnabled(true);
+//        lowerRightView.setDrawingCacheEnabled(true);
+//        lowerLeftView.setDrawingCacheEnabled(true);
+//        imageView.setDrawingCacheEnabled(true);
+//        
+//        upperRightView.setTextColor(Color.BLACK);
+//        upperRightView.setBackgroundColor(Color.WHITE);
+//        lowerRightView.setTextColor(Color.BLACK);
+//        lowerRightView.setBackgroundColor(Color.WHITE);
+//        lowerLeftView.setTextColor(Color.BLACK);
+//        lowerLeftView.setBackgroundColor(Color.WHITE);
+        
+        canvas.drawText(textUpperRight,(float) (offset+560 *(1-vertical_ratio)), 0,paint);
+        canvas.drawText(textLowerRight,(float) (offset+560 *(1-vertical_ratio)), (float) (320 * (1-horizontal_ratio)),paint);
+        canvas.drawText(textLowerLeft,offset,(float) (320 * (1-horizontal_ratio)), paint);
+        
+        		
+//        upperRightView.measure(MeasureSpec.makeMeasureSpec((int) (560*(1-vertical_ratio)), MeasureSpec.EXACTLY),
+//       		 MeasureSpec.makeMeasureSpec((int) (320*(horizontal_ratio)), MeasureSpec.EXACTLY));
+//        lowerRightView.measure(MeasureSpec.makeMeasureSpec((int) (560*(1-vertical_ratio)), MeasureSpec.EXACTLY),
+//       		 MeasureSpec.makeMeasureSpec((int) (320*(horizontal_ratio)), MeasureSpec.EXACTLY));
+//        lowerLeftView.measure(MeasureSpec.makeMeasureSpec((int) (560*(vertical_ratio)), MeasureSpec.EXACTLY),
+//       		 MeasureSpec.makeMeasureSpec((int) (320*(1-horizontal_ratio)), MeasureSpec.EXACTLY));
+//        imageView.measure(MeasureSpec.makeMeasureSpec((int) (560*(vertical_ratio)), MeasureSpec.EXACTLY),
+//       		 MeasureSpec.makeMeasureSpec((int) (320*(horizontal_ratio)), MeasureSpec.EXACTLY));
+//        upperRightView.setGravity(0x10);
+//
+//        
+//        upperRightView.layout((int)(rightOffset+560*vertical_ratio),0,560+rightOffset,(int)(320*horizontal_ratio));
+//        lowerRightView.layout((int)(rightOffset+560*vertical_ratio),(int)(320*horizontal_ratio),560+rightOffset,320);
+//        lowerLeftView.layout((int)rightOffset,(int)(320*horizontal_ratio),(int)(rightOffset+560*vertical_ratio),320);             
+//        imageView.layout(rightOffset,0,(int)(rightOffset+560*vertical_ratio),(int)(320*horizontal_ratio));
+
+        // draw the bitmap from the drawingcache to the canvas
+//        canvas.drawBitmap(upperRightView.getDrawingCache(), (float) (rightOffset+560*vertical_ratio), 0, paint);
+//        canvas.drawBitmap(lowerRightView.getDrawingCache(), (float) (rightOffset+560*vertical_ratio),
+//       		 (float) (320*horizontal_ratio), paint);
+//        canvas.drawBitmap(lowerLeftView.getDrawingCache(), rightOffset,  (float) (320*horizontal_ratio), paint);
+        //canvas.drawBitmap(imageView.getDrawingCache(), rightOffset, 0, paint);
+
+
+        // disable drawing cache
+//        upperRightView.setDrawingCacheEnabled(false);
+//        lowerRightView.setDrawingCacheEnabled(false);
+//        lowerLeftView.setDrawingCacheEnabled(false);
+//        imageView.setDrawingCacheEnabled(false);
+    }
+
+   
     private void setupAnimator() {
         mAnimator.setInterpolator(new LinearInterpolator());
         mAnimator.setDuration(250);
@@ -217,12 +300,6 @@ public class ARView extends View {
             }
         });
 
-        // Notifies us when the animation is over. During an animation, the user's head may have
-        // continued to move to a different orientation than the original destination angle of the
-        // animation. Since we can't easily change the animation goal while it is running, we call
-        // animateTo() again, which will either redraw at the new orientation (if the difference is
-        // small enough), or start another animation to the new heading. This seems to produce
-        // fluid results.
         mAnimator.addListener(new AnimatorListenerAdapter() {
 
             @Override
