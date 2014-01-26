@@ -67,7 +67,7 @@ public class EventFetcher {
 							Event newEvent = new Event(event.getObjectId(),
 									event.getString(EVENT_NAME), 
 									event.getString(EVENT_DETAIL), 
-									event.getString(creator.getString(CREATOR_NAME)),
+									creator.getString(CREATOR_NAME),
 									picture, point.getLatitude(), 
 									point.getLongitude(), 
 									gallery);

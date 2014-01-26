@@ -194,8 +194,8 @@ public class ARView extends View {
                             - 14 / 2);
                     int fy = -320/2;
                     
-                    //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);    
-                    drawEvent(canvas, fx, fy, "helloWorld", "helloWorld", "helloWorld", place.getCreatorPicture(), eventTextPaint);
+                    //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
+                    drawEvent(canvas, fx, fy, place.getName(), place.getCreatorName(), place.getDetail(), place.getCreatorPicture(), eventTextPaint);
                 }
         }
     }
