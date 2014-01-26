@@ -34,8 +34,7 @@ public class Event {
     private final double latitude;
     private final double longitude;
     private final List<String> gallery;
-    
-    
+    private List<String> reviews;
 
     public Event(String id, String name, String detail, String creatorName,
 			Bitmap creatorPicture, double latitude, double longitude,
@@ -51,7 +50,7 @@ public class Event {
 		this.gallery = gallery;
 	}
 
-    public Bitmap getCreatorPicture() {
+	public Bitmap getCreatorPicture() {
     	return creatorPicture;
     }
     
@@ -82,6 +81,15 @@ public class Event {
 	public List<String> getGallery() {
 		return gallery;
 	}
+
+	public List<String> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<String> reviews) {
+		this.reviews = reviews;
+	}
+
     
     
 }

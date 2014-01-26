@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import location.Event;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,41 +34,20 @@ public class CardScrollActivity extends Activity {
 
     private void createCards() {
         mCards = new ArrayList<Card>();
-        
-        List<Event> events = ARView.owlevents;
         Card card;
-        File file = null;
-        for (Event event : events) {
-        	List<String> photos = event.getGallery();
-        	if (!photos.isEmpty()) {
-        		for (String photo : photos) {
-        			card = new Card(this);
-        			card.setImageLayout(Card.ImageLayout.FULL);
-        			file = new File(getApplicationContext().getFilesDir(), photo);
-        			card.addImage(Uri.parse(file.toURI().toString()));
-        			mCards.add(card);
-        		}
-        		break;
-        	} 
-        }
+        File file;
+        List<String> photos = ARView.eventInSight.getGallery();
+    	if (!photos.isEmpty()) {
+    		for (String photo : photos) {
+    			card = new Card(this);
+    			card.setImageLayout(Card.ImageLayout.FULL);
+    			file = new File(getApplicationContext().getFilesDir(), photo);
+    			System.out.println(photo + " " + file.exists());
+    			card.addImage(Uri.parse(file.toURI().toString()));
+    			mCards.add(card);
+    		}
+    	} 
         
-//        final File fil = file;
-//        String eventId = "omFao4nmfv";
-//        String eventName = "CS";
-//    	EventFetcher fetcher = new EventFetcher(getApplicationContext());
-//    	FileInputStream fis;
-//		try {
-//			fis = new FileInputStream(fil);
-//			byte[] bytes = new byte[(int) fil.length()];
-//        	fis.read(bytes);
-//        	System.out.println("Save event for id " + eventId + " name " + eventName);
-//        	fetcher.uploadGalleryPicture(eventId, bytes, eventName);
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//        
 //        card = new Card(this);
 //        card.setText("This card has a footer.");
 //        card.setFootnote("I'm the footer!");

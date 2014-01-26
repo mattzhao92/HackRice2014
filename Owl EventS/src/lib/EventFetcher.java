@@ -32,6 +32,8 @@ public class EventFetcher {
 	public static final String CREATOR_NAME = "name";
 	public static final String GALLERY_EVENT_ID = "eventId";
 	public static final String GALLERY_PHOTO = "photo";
+	public static final String REVIEW_CONTENT = "content";
+	public static final String REVIEW_EVENT_ID = "eventId";
 	
 	private Context context;
 
@@ -52,26 +54,23 @@ public class EventFetcher {
 					creator.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
 						@Override
 						public void done(ParseObject object, ParseException e) {
-//							System.out.println(creator.getString(CREATOR_NAME));
+							System.out.println(creator.getString(CREATOR_NAME));
+							System.out.println("==============");
 							// Download the profile picture.
-							ParseFile pic = creator
-									.getParseFile(CREATOR_PICTURE);
+							ParseFile pic = creator.getParseFile(CREATOR_PICTURE);
 							Bitmap picture = parseFileToBitmap(pic);
-							ParseGeoPoint point = (ParseGeoPoint) event
-									.get(EVENT_LOCATION);
-							List<String> gallery = getEventPhotoGallery(event
-									.getObjectId());
-							picture = Bitmap
-									.createScaledBitmap(picture,
+							ParseGeoPoint point = (ParseGeoPoint) event.get(EVENT_LOCATION);
+							List<String> gallery = getEventPhotoGallery(event.getObjectId());
+							picture = Bitmap.createScaledBitmap(picture,
 											(int) (560 * 0.4),
 											(int) (320 * 0.6), false);
 							Event newEvent = new Event(event.getObjectId(),
-									event.getString(EVENT_NAME), event
-											.getString(EVENT_DETAIL), event
-											.getString(creator
-													.getString(CREATOR_NAME)),
-									picture, point.getLatitude(), point
-											.getLongitude(), gallery);
+									event.getString(EVENT_NAME), 
+									event.getString(EVENT_DETAIL), 
+									event.getString(creator.getString(CREATOR_NAME)),
+									picture, point.getLatitude(), 
+									point.getLongitude(), 
+									gallery);
 
 							collection.add(newEvent);
 						}
@@ -82,12 +81,14 @@ public class EventFetcher {
 	}
 
 	public ArrayList<String> getEventPhotoGallery(String eventId) {
+		System.out.println("Get gallery for " + eventId);
 		ParseQuery<ParseObject> galleryQuery = ParseQuery.getQuery("Gallery");
 		galleryQuery.whereEqualTo(GALLERY_EVENT_ID, eventId);
 		ArrayList<String> photos = new ArrayList<String>();
 		try {
 			List<ParseObject> gallery = galleryQuery.find();
 			for (ParseObject photo : gallery) {
+				System.out.println("Saveeee");
 				ParseFile photoFile = photo.getParseFile(GALLERY_PHOTO);
 				byte[] fileByte = photoFile.getData();
 				String name = photoFile.getName();
@@ -114,6 +115,28 @@ public class EventFetcher {
 			e1.printStackTrace();
 		}
 		return bitmap;
+	}
+	
+	public void saveReivew(String content, String eventId) {
+		ParseObject review = new ParseObject("Review");
+		review.put(REVIEW_CONTENT, content);
+		review.put(REVIEW_EVENT_ID, eventId);
+		review.saveInBackground();
+	}
+	
+	public void getReviews(String eventId, final ICallBack callBack) {
+		ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("Review");
+		eventQuery.whereEqualTo(REVIEW_EVENT_ID, eventId);
+		eventQuery.findInBackground(new FindCallback<ParseObject>() {
+			@Override
+			public void done(List<ParseObject> reviewObjs, ParseException e) {
+				ArrayList<String> reviews = new ArrayList<String>();
+				for (ParseObject review : reviewObjs) {
+					reviews.add(review.getString(REVIEW_CONTENT));
+				}
+				callBack.call(reviews);
+			}
+		});
 	}
 
 	public void uploadGalleryPicture(final String eventId, byte[] photoByte,
@@ -148,5 +171,5 @@ public class EventFetcher {
 			}
 		}
 	}
-		
+	
 }

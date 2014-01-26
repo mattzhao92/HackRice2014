@@ -17,6 +17,7 @@
 package main;
 
 
+import location.Event;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -77,7 +78,7 @@ public class MenuActivity extends Activity {
 
     @Override
     public void openOptionsMenu() {
-        if (mResumed && mCompassService != null) {
+        if (mResumed && mCompassService != null && ARView.eventInSight != null) {
             super.openOptionsMenu();
         }
     }
@@ -100,13 +101,11 @@ public class MenuActivity extends Activity {
                 return true;
             case R.id.upload_snapshot:
             	Intent it = new Intent(MenuActivity.this, CameraActivity.class);
-            	Bundle bundle = new Bundle();
-            	// TODO
-            	bundle.putString("eventId", "omFao4nmfv");
-            	bundle.putString("eventName", "CS Club");
-            	it.putExtras(bundle);
+//            	Bundle bundle = new Bundle();
+//            	bundle.putString("eventId", eventInSight.getId());
+//            	bundle.putString("eventName", eventInSight.getName());
+//            	it.putExtras(bundle);
             	startActivity(it);
-//            	takePicture();
             	return true;
             case R.id.stop:
                 //stopService(new Intent(this, EventService.class));
