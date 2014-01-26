@@ -37,7 +37,8 @@ public class CameraActivity extends Activity {
     }
     
     
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	System.out.println("Pic takesss");
         if (requestCode == TAKE_PICTURE_REQUEST && resultCode == RESULT_OK) {
         	System.out.println("Pic take");

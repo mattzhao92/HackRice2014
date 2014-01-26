@@ -107,7 +107,8 @@ public class ARView extends View {
         setupAnimator();
     }
 
-    protected void onDraw(Canvas canvas) {
+    @Override
+	protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         // The view displays 90 degrees across its width so that one 90 degree head rotation is
@@ -153,9 +154,9 @@ public class ARView extends View {
         
         int card_index = (int)Math.floor(mAnimatedHeading/30);
         if (non_alpha[card_index]) {
-        	this.eventInSight = null;
+        	ARView.eventInSight = null;
         } else {
-        	this.eventInSight = event_map[card_index];
+        	ARView.eventInSight = event_map[card_index];
         }
     	
     	for (int i = -2; i < NUMBER_EMPTY_CARDS + 3; i++) {
