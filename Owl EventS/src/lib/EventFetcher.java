@@ -39,7 +39,7 @@ public class EventFetcher {
 		this.context = context;
 	}
 
-	public void getAllEvents(final List<Event> collection) {
+	public void getAllEvents(final List<Event> collection, final GetCallback<ParseObject> callback) {
 		ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("Event");
 		eventQuery.findInBackground(new FindCallback<ParseObject>() {
 			@Override
@@ -74,6 +74,8 @@ public class EventFetcher {
 											.getLongitude(), gallery);
 
 							collection.add(newEvent);
+							if (callback != null)
+								callback.done(null, new ParseException(0, "parse"));
 						}
 					});
 				}

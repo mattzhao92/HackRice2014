@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import lib.EventFetcher;
+import location.Event;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,9 +26,12 @@ public class CameraActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getIntent().getExtras();
-        eventId = bundle.getString("eventId");
-        eventName = bundle.getString("eventName") + ".jpg";
+//        Bundle bundle = getIntent().getExtras();
+//        eventId = bundle.getString("eventId");
+//        eventName = bundle.getString("eventName") + ".jpg";
+        Event event = ARView.eventInSight;
+        eventId = event.getId();
+        eventName = event.getName() + ".jpg";
         takePicture();
     }
     

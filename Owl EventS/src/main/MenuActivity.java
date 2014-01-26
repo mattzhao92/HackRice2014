@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -98,6 +99,14 @@ public class MenuActivity extends Activity {
             	Intent intent = new Intent(MenuActivity.this, CardScrollActivity.class);
             	startActivity(intent);
                 return true;
+            case R.id.give_direction:
+            	Intent nav_intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q=Houston&mode=w"));
+                startActivity(nav_intent);
+                return true;
+            case R.id.say_review:
+            	Intent review_intent = new Intent(MenuActivity.this, ReviewActivity.class);
+            	startActivity(review_intent);
+                return true;
             case R.id.upload_snapshot:
             	Intent it = new Intent(MenuActivity.this, CameraActivity.class);
             	Bundle bundle = new Bundle();
@@ -106,7 +115,6 @@ public class MenuActivity extends Activity {
             	bundle.putString("eventName", "CS Club");
             	it.putExtras(bundle);
             	startActivity(it);
-//            	takePicture();
             	return true;
             case R.id.stop:
                 //stopService(new Intent(this, EventService.class));

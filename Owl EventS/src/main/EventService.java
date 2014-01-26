@@ -67,7 +67,6 @@ public class EventService extends Service {
             mRenderer = new ARViewRenderer(this, mOrientationManager);
 
             mLiveCard.setDirectRenderingEnabled(true).getSurfaceHolder().addCallback(mRenderer);
-
             // Display the options menu when the live card is tapped.
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
