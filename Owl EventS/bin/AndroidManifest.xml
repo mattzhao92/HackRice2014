@@ -39,6 +39,14 @@
         <activity
             android:name="main.MenuActivity"
             android:theme="@style/MenuTheme" />
+        
+        <activity
+            android:name="main.CardScrollActivity"
+            android:theme="@style/MenuTheme" />
+                
+        <activity
+            android:name="main.GalleryActivity"
+            android:theme="@style/MenuTheme" />
 
         <service
             android:name="main.EventService"

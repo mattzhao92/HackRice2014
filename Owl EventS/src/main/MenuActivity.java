@@ -92,6 +92,10 @@ public class MenuActivity extends Activity {
             case R.id.view_summary:
                 //mCompassService.readHeadingAloud();
                 return true;
+            case R.id.view_gallery:
+            	Intent intent = new Intent(MenuActivity.this, CardScrollActivity.class);
+            	startActivity(intent);
+                return true;
             case R.id.stop:
                 //stopService(new Intent(this, EventService.class));
                 return true;

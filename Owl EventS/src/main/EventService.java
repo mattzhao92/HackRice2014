@@ -16,7 +16,6 @@
 
 package main;
 
-import com.google.android.glass.sample.compass.R;
 import com.google.android.glass.timeline.LiveCard;
 import com.google.android.glass.timeline.LiveCard.PublishMode;
 import com.google.android.glass.timeline.TimelineManager;
@@ -26,14 +25,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.speech.tts.TextToSpeech;
 
-import lib.Utils;
 import location.Landmarks;
 import location.OrientationManager;
 
@@ -46,7 +42,6 @@ public class EventService extends Service {
     }
 
     private final CompassBinder mBinder = new CompassBinder();
-
     private OrientationManager mOrientationManager;
     private Landmarks mLandmarks;
     
