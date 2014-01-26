@@ -17,6 +17,7 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 public class EventFetcher {
 
@@ -115,15 +116,22 @@ public class EventFetcher {
 		return bitmap;
 	}
 
-	public void uploadGalleryPicture(String eventId, byte[] photoByte,
+	public void uploadGalleryPicture(final String eventId, byte[] photoByte,
 			String photoName) {
-		ParseObject photo = new ParseObject("Gallery");
-		ParseFile file = new ParseFile(photoName, photoByte);
-		file.saveInBackground();
-		// Associate the photo with the data.
-		photo.put(GALLERY_PHOTO, photo);
-		photo.put(GALLERY_EVENT_ID, eventId);
-		photo.saveInBackground();
+		final ParseObject photo = new ParseObject("Gallery");
+		final ParseFile file = new ParseFile(photoName, photoByte);
+		file.saveInBackground(new SaveCallback() {
+			
+			@Override
+			public void done(ParseException e) {
+				// Associate the photo with the data.
+				photo.put(GALLERY_PHOTO, file);
+				photo.put(GALLERY_EVENT_ID, eventId);
+				System.out.println("Save file");
+				photo.saveInBackground();
+			}
+		});
+	
 	}
 
 	public void saveFile(String filename, byte[] file) {

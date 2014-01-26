@@ -104,7 +104,8 @@ public class MenuActivity extends Activity {
             	// TODO
             	bundle.putString("eventId", "omFao4nmfv");
             	bundle.putString("eventName", "CS Club");
-            	startActivity(it.putExtras(bundle));
+            	it.putExtras(bundle);
+            	startActivity(it);
 //            	takePicture();
             	return true;
             case R.id.stop:

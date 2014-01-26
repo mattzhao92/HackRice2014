@@ -4,12 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lib.EventFetcher;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.FileObserver;
 import android.provider.MediaStore;
 
 import com.google.android.glass.media.CameraManager;
@@ -24,8 +25,9 @@ public class CameraActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        eventId = savedInstanceState.getString("eventId");
-        eventName = savedInstanceState.getString("eventName");
+        Bundle bundle = getIntent().getExtras();
+        eventId = bundle.getString("eventId");
+        eventName = bundle.getString("eventName") + ".jpg";
         takePicture();
     }
     
@@ -50,7 +52,7 @@ public class CameraActivity extends Activity {
     
     private void processPictureWhenReady(final String picturePath) {
         final File pictureFile = new File(picturePath);
-        System.out.println("File is ready???");
+        System.out.println("File is ready???" + picturePath);
         if (pictureFile.exists()) {
             // The picture is ready; process it.
         	System.out.println("File is ready");
@@ -60,6 +62,7 @@ public class CameraActivity extends Activity {
 				fis = new FileInputStream(pictureFile);
 				byte[] bytes = new byte[(int) pictureFile.length()];
 	        	fis.read(bytes);
+	        	System.out.println("Save event for id " + eventId + " name " + eventName);
 	        	fetcher.uploadGalleryPicture(eventId, bytes, eventName);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -72,38 +75,16 @@ public class CameraActivity extends Activity {
             // can update your UI to let the user know that the application is
             // waiting for the picture (for example, by displaying the thumbnail
             // image and a progress indicator).
-
-            final File parentDirectory = pictureFile.getParentFile();
-            FileObserver observer = new FileObserver(parentDirectory.getPath()) {
-                // Protect against additional pending events after CLOSE_WRITE is
-                // handled.
-                private boolean isFileWritten;
-
-                @Override
-                public void onEvent(int event, String path) {
-                    if (!isFileWritten) {
-                        // For safety, make sure that the file that was created in
-                        // the directory is actually the one that we're expecting.
-                        File affectedFile = new File(parentDirectory, path);
-                        isFileWritten = (event == FileObserver.CLOSE_WRITE
-                                && affectedFile.equals(pictureFile));
-
-                        if (isFileWritten) {
-                            stopWatching();
-
-                            // Now that the file is ready, recursively call
-                            // processPictureWhenReady again (on the UI thread).
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    processPictureWhenReady(picturePath);
-                                }
-                            });
-                        }
-                    }
-                }
-            };
-            observer.startWatching();
+        	System.out.println("Not ready");
+        	
+        	Timer timer = new Timer();
+        	timer.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					processPictureWhenReady(picturePath);
+				}
+			}, 1000);
         }
     }
 }
