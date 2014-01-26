@@ -32,7 +32,6 @@ import android.widget.FrameLayout;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import location.Landmarks;
 import location.OrientationManager;
 import location.Event;
 
@@ -54,8 +53,7 @@ public class ARViewRenderer implements DirectRenderingCallback {
     private final FrameLayout mLayout;
     private final ARView mCompassView;
     private final OrientationManager mOrientationManager;
-    private final Landmarks mLandmarks;
-
+    
     private final OrientationManager.OnChangedListener mCompassListener =
             new OrientationManager.OnChangedListener() {
 
@@ -67,9 +65,6 @@ public class ARViewRenderer implements DirectRenderingCallback {
         @Override
         public void onLocationChanged(OrientationManager orientationManager) {
             Location location = orientationManager.getLocation();
-            List<Event> places = mLandmarks.getNearbyLandmarks(
-                    location.getLatitude(), location.getLongitude());
-            //mCompassView.setNearbyPlaces(places);
         }
 
         @Override
@@ -78,16 +73,13 @@ public class ARViewRenderer implements DirectRenderingCallback {
     };
 
     
-    public ARViewRenderer(Context context, OrientationManager orientationManager,
-                Landmarks landmarks) {
+    public ARViewRenderer(Context context, OrientationManager orientationManager) {
         LayoutInflater inflater = LayoutInflater.from(context);
         mLayout = (FrameLayout) inflater.inflate(R.layout.compass, null);
         mLayout.setWillNotDraw(false);
 
         mCompassView = (ARView) mLayout.findViewById(R.id.compass);
         mOrientationManager = orientationManager;
-        mLandmarks = landmarks;
-
         mCompassView.setOrientationManager(mOrientationManager);
     }
 
@@ -104,13 +96,6 @@ public class ARViewRenderer implements DirectRenderingCallback {
 
         mOrientationManager.addOnChangedListener(mCompassListener);
         mOrientationManager.start();
-
-        if (mOrientationManager.hasLocation()) {
-            Location location = mOrientationManager.getLocation();
-            List<Event> nearbyPlaces = mLandmarks.getNearbyLandmarks(
-                    location.getLatitude(), location.getLongitude());
-            //mCompassView.setNearbyPlaces(nearbyPlaces);
-        }
 
         mRenderThread = new RenderThread();
         mRenderThread.start();

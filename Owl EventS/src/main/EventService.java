@@ -29,8 +29,6 @@ import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
-
-import location.Landmarks;
 import location.OrientationManager;
 
 public class EventService extends Service {
@@ -43,8 +41,7 @@ public class EventService extends Service {
 
     private final CompassBinder mBinder = new CompassBinder();
     private OrientationManager mOrientationManager;
-    private Landmarks mLandmarks;
-    
+ 
     private TimelineManager mTimelineManager;
     private LiveCard mLiveCard;
     private ARViewRenderer mRenderer;
@@ -56,7 +53,6 @@ public class EventService extends Service {
         mTimelineManager = TimelineManager.from(this);
         mOrientationManager = new OrientationManager((SensorManager) getSystemService(Context.SENSOR_SERVICE), 
         											 (LocationManager) getSystemService(Context.LOCATION_SERVICE));
-        mLandmarks = new Landmarks(this);
     }
 
     @Override
@@ -68,7 +64,7 @@ public class EventService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mLiveCard == null) {
             mLiveCard = mTimelineManager.createLiveCard(LIVE_CARD_ID);
-            mRenderer = new ARViewRenderer(this, mOrientationManager, mLandmarks);
+            mRenderer = new ARViewRenderer(this, mOrientationManager);
 
             mLiveCard.setDirectRenderingEnabled(true).getSurfaceHolder().addCallback(mRenderer);
 
@@ -92,8 +88,6 @@ public class EventService extends Service {
         }
 
         mOrientationManager = null;
-        mLandmarks = null;
-
         super.onDestroy();
     }
 }
