@@ -22,7 +22,6 @@ import com.google.android.glass.timeline.DirectRenderingCallback;
 import android.content.Context;
 import android.graphics.Canvas;
 
-import android.location.Location;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,7 +63,7 @@ public class ARViewRenderer implements DirectRenderingCallback {
 
         @Override
         public void onLocationChanged(OrientationManager orientationManager) {
-            Location location = orientationManager.getLocation();
+
         }
 
         @Override
@@ -109,11 +108,6 @@ public class ARViewRenderer implements DirectRenderingCallback {
         mOrientationManager.stop();
     }
 
-    /**
-     * Requests that the views redo their layout. This must be called manually every time the
-     * tips view's text is updated because this layout doesn't exist in a GUI thread where those
-     * requests will be enqueued automatically.
-     */
     private void doLayout() {
         // Measure and update the layout so that it will take up the entire surface space
         // when it is drawn.

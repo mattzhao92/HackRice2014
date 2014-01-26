@@ -123,7 +123,7 @@ public class MenuActivity extends Activity {
                 startActivity(nav_intent);
                 return true;
             case R.id.say_review:
-            	Intent review_intent = new Intent(MenuActivity.this, ReviewActivity.class);
+            	Intent review_intent = new Intent(MenuActivity.this, ReviewVoiceActivity.class);
             	startActivity(review_intent);
                 return true;
             case R.id.upload_snapshot:

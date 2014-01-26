@@ -186,8 +186,9 @@ public class ARView extends View {
     void drawMultilineText(Canvas canvas, String str, int x, int y, Paint paint) {
         int      lineHeight = 0;
         int      yoffset    = 0;
-        String[] lines      = str.split("\n");
-
+        System.out.println("INPUT_STRING "+str+"\n");
+        String[] lines      = str.split("\\$");
+ 
         paint.getTextBounds("Ig", 0, 2, mBounds);
         lineHeight = (int) ((float) mBounds.height() * 1.2);
         
@@ -219,7 +220,7 @@ public class ARView extends View {
                     int fy = -320/2;
                     
                     //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
-                    drawEvent(canvas, fx, fy, "Me have a sandwd \nAnd I have a babldd", place.getCreatorName(), "This is a detail, \na detail is what it\nAnother line here", place.getCreatorPicture(), eventTextPaint);
+                    drawEvent(canvas, fx, fy, place.getName(), place.getCreatorName(), place.getDetail(), place.getCreatorPicture(), eventTextPaint);
                 }
         }
     }
