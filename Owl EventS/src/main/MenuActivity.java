@@ -17,6 +17,10 @@
 package main;
 
 
+import java.util.ArrayList;
+
+import lib.EventFetcher;
+import lib.ICallBack;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -130,6 +134,20 @@ public class MenuActivity extends Activity {
             	it.putExtras(bundle);
             	startActivity(it);
             	return true;
+            case R.id.see_reviews:
+            	EventFetcher ef = new EventFetcher(getApplicationContext());
+            	ef.getReviews(ARView.eventInSight.getId(), new ICallBack() {
+					@Override
+					public void call(Object... params) {
+						@SuppressWarnings("unchecked")
+						ArrayList<String> rs = (ArrayList<String>) params[0];
+						System.out.println("Rs is " + rs);
+						ARView.eventInSight.getReviews().addAll(rs);
+						Intent viewIntent = new Intent(MenuActivity.this, ReviewDisplayActivity.class);
+						startActivity(viewIntent);
+					}
+				});
+            	
             case R.id.stop:
                 //stopService(new Intent(this, EventService.class));
                 return true;

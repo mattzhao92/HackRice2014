@@ -38,13 +38,13 @@
         android:icon="@drawable/ic_read_aloud"/>
 
     <item
+        android:id="@+id/see_reviews"
+        android:title="@string/see_reviews"
+        android:icon="@drawable/ic_read_aloud"/>
+        
+    <item
         android:id="@+id/give_direction"
         android:title="@string/give_direction"
-        android:icon="@drawable/ic_read_aloud"/>
-    
-    <item
-        android:id="@+id/share_google_plus"
-        android:title="@string/share_google_plus"
         android:icon="@drawable/ic_read_aloud"/>
         
     <item

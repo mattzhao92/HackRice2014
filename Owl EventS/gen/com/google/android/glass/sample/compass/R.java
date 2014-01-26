@@ -25,9 +25,9 @@ public final class R {
     }
     public static final class id {
         public static final int compass=0x7f0b0000;
-        public static final int give_direction=0x7f0b0008;
+        public static final int give_direction=0x7f0b0009;
         public static final int say_review=0x7f0b0007;
-        public static final int share_google_plus=0x7f0b0009;
+        public static final int see_reviews=0x7f0b0008;
         public static final int stop=0x7f0b000a;
         public static final int tips_container=0x7f0b0001;
         public static final int tips_view=0x7f0b0002;
@@ -57,7 +57,7 @@ public final class R {
         public static final int pitch_too_steep=0x7f070005;
         public static final int place_text_format=0x7f070004;
         public static final int say_review=0x7f07000b;
-        public static final int share_google_plus=0x7f07000d;
+        public static final int see_reviews=0x7f07000d;
         public static final int show_compass_voice_trigger=0x7f070001;
         /**  Spoken strings. 
          */

@@ -40,7 +40,7 @@
     <string name="upload_snapshot">Upload Snapshot</string>
     <string name="say_review"> Say a Review </string>
     <string name="give_direction"> Give Driection </string>
-    <string name="share_google_plus"> Share on Google+ </string>
+    <string name="see_reviews"> Display reviews </string>
     <string name="stop">Stop</string>
 
 </resources>

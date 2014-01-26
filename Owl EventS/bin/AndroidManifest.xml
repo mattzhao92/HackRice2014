@@ -57,6 +57,9 @@
         <activity
             android:name="main.SummaryActivity"
             android:theme="@style/MenuTheme" />
+        <activity
+            android:name="main.ReviewDisplayActivity"
+            android:theme="@style/MenuTheme" />
         
         <service
             android:name="main.EventService"

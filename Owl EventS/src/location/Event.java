@@ -16,6 +16,7 @@
 
 package location;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.Bitmap;
@@ -35,7 +36,7 @@ public class Event {
     private final double latitude;
     private final double longitude;
     private final List<String> gallery;
-    private List<String> reviews;
+    private List<String> reviews = new ArrayList<String>();
 
 
 	public Event(String id, String name, String detail, String creatorName,
