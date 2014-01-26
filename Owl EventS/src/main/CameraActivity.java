@@ -46,8 +46,6 @@ public class CameraActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
     
-    
-    
     private void processPictureWhenReady(final String picturePath) {
         final File pictureFile = new File(picturePath);
         System.out.println("File is ready???");
