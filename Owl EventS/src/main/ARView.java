@@ -186,7 +186,7 @@ public class ARView extends View {
     void drawMultilineText(Canvas canvas, String str, int x, int y, Paint paint) {
         int      lineHeight = 0;
         int      yoffset    = 0;
-        String[] lines      = str.split("\n");
+        String[] lines      = str.split("$");
 
         paint.getTextBounds("Ig", 0, 2, mBounds);
         lineHeight = (int) ((float) mBounds.height() * 1.2);
