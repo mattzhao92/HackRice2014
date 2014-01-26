@@ -53,6 +53,7 @@ public class EventFetcher {
 							Bitmap picture = parseFileToBitmap(pic);
 							ParseGeoPoint point = (ParseGeoPoint)event.get(EVENT_LOCATION);
 							List<Bitmap> gallery = getEventPhotoGallery(event.getObjectId());
+							picture = Bitmap.createScaledBitmap(picture, (int) (560 * 0.4), (int) (320 * 0.6), false);
 							Event newEvent = new Event(event.getObjectId(),
 									event.getString(EVENT_NAME),
 									event.getString(EVENT_DETAIL),

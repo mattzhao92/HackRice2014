@@ -17,9 +17,8 @@
 package main;
 
 
-import android.animation.Animator;
+import android.animation.*;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.graphics.*;
@@ -28,11 +27,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import java.io.File;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -46,8 +41,9 @@ import location.Event;
 
 public class ARView extends View {
 
-    /** Various dimensions and other drawing-related constants. */
-    private static final float DIRECTION_TEXT_HEIGHT = 84.0f;
+
+	private static final float EVENT_PICTURE_OFFSETX = 560/20;
+	private static final float EVENT_PICTURE_OFFSETY = 320/20;
     private static final float PLACE_TEXT_HEIGHT = 22.0f;
     private static final float PLACE_PIN_WIDTH = 14.0f;
 
@@ -57,27 +53,15 @@ public class ARView extends View {
      */
     private static final float MIN_DISTANCE_TO_ANIMATE = 15.0f;
 
-    /** The actual heading that represents the direction that the user is facing. */
     private float mHeading;
-
-    /**
-     * Represents the heading that is currently being displayed when the view is drawn. This is
-     * used during animations, to keep track of the heading that should be drawn on the current
-     * frame, which may be different than the desired end point.
-     */
     private float mAnimatedHeading;
-
-    private OrientationManager mOrientation;
-    private List<Event> mNearbyPlaces;
-
-    private final Paint mPaint;
-    private final TextPaint mPlacePaint;
-    private final List<Rect> mAllBounds;
-    private final NumberFormat mDistanceFormat;
+    private final TextPaint eventTextPaint;
+    private final TextPaint eventBackgroundPaint;
     private final ValueAnimator mAnimator;
-    private final Context mcontext;
-    
     private EventFetcher eventFetcher;
+    private OrientationManager mOrientation;
+    private List<Event> owlevents;
+
 
     private Timer timer = new Timer();
     
@@ -92,66 +76,33 @@ public class ARView extends View {
     public ARView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        this.mNearbyPlaces = new ArrayList<Event>();
-        mPaint = new Paint();
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setAntiAlias(true);
-        mPaint.setTextSize(DIRECTION_TEXT_HEIGHT);
-        mPaint.setTypeface(Typeface.createFromFile(new File("/system/glass_fonts",
-                "Roboto-Thin.ttf")));
+        owlevents = new ArrayList<Event>();
 
-        mPlacePaint = new TextPaint();
-        mPlacePaint.setStyle(Paint.Style.FILL);
-        mPlacePaint.setAntiAlias(true);
-        mPlacePaint.setColor(Color.WHITE);
-        mPlacePaint.setTextSize(PLACE_TEXT_HEIGHT);
-        mPlacePaint.setTypeface(Typeface.createFromFile(new File("/system/glass_fonts",
-                "Roboto-Light.ttf")));
-
-        mAllBounds = new ArrayList<Rect>();
-
-        mDistanceFormat = NumberFormat.getNumberInstance();
-        mDistanceFormat.setMinimumFractionDigits(0);
-        mDistanceFormat.setMaximumFractionDigits(1);
-
+        eventTextPaint = new TextPaint();
+        eventTextPaint.setStyle(Paint.Style.FILL);
+        eventTextPaint.setAntiAlias(true);
+        eventTextPaint.setColor(Color.BLACK);
+        eventTextPaint.setTextSize(PLACE_TEXT_HEIGHT);
+        
+        eventBackgroundPaint  = new TextPaint();
+        eventBackgroundPaint.setStyle(Paint.Style.FILL);
+        eventBackgroundPaint.setAntiAlias(true);
+        eventBackgroundPaint.setColor(Color.WHITE);
         mAnimatedHeading = Float.NaN;
 
         mAnimator = new ValueAnimator();
         eventFetcher = new EventFetcher();
-        eventFetcher.getAllEvents(mNearbyPlaces);
+        eventFetcher.getAllEvents(owlevents);
         timer.schedule(new TimerTask() {
 			
  			@Override
  			public void run() {
- 				eventFetcher.getAllEvents(mNearbyPlaces);
+ 				eventFetcher.getAllEvents(owlevents);
  			}
  		}, 1000, 25000);
-        this.mcontext = context;
         setupAnimator();
     }
 
-  
-    public void setOrientationManager(OrientationManager orientationManager) {
-        mOrientation = orientationManager;
-    }
-
-    /**
-     * Gets the current heading in degrees.
-     *
-     * @return the current heading.
-     */
-    public float getHeading() {
-        return mHeading;
-    }
-
- 
-    public void setHeading(float degrees) {
-        mHeading = Utils.mod(degrees, 360.0f);
-        animateTo(mHeading);
-    }
-
- 
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
@@ -164,9 +115,6 @@ public class ARView extends View {
         canvas.save();
         canvas.translate(-mAnimatedHeading * pixelsPerDegree + centerX, centerY);
 
-        // In order to ensure that places on a boundary close to 0 or 360 get drawn correctly, we
-        // draw them three times; once to the left, once at the "true" bearing, and once to the
-        // right.
         for (int i = -1; i <= 1; i++) {
             drawEvents(canvas, pixelsPerDegree, i * pixelsPerDegree * 360);
         }
@@ -176,18 +124,12 @@ public class ARView extends View {
     
   
     private void drawEvents(Canvas canvas, float pixelsPerDegree, float offset) {
-        if (mOrientation.hasLocation() && mNearbyPlaces != null) {
-            synchronized (mNearbyPlaces) {
+        if (mOrientation.hasLocation() && owlevents != null) {
                 Location userLocation = mOrientation.getLocation();
                 double latitude1 = userLocation.getLatitude();
                 double longitude1 = userLocation.getLongitude();
 
-                mAllBounds.clear();
-
-                int place_index = 0;
-                
-                System.out.println("Size of Nearby Places : "+mNearbyPlaces.size());
-                ArrayList<Event> eventsCopy = new ArrayList<Event>(mNearbyPlaces);
+                ArrayList<Event> eventsCopy = new ArrayList<Event>(owlevents);
                 for (Event place : eventsCopy) {
                     double latitude2 = place.getLatitude();
                     double longitude2 = place.getLongitude();
@@ -196,18 +138,14 @@ public class ARView extends View {
 
                     int fx = (int) (offset + bearing * pixelsPerDegree
                             - PLACE_PIN_WIDTH / 2);
-                    int fy = -160;
+                    int fy = -320/2;
                     
                     //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
-                    //Rect rect = new Rect(fx,fy,fx+560,fy+320);
-
-                    //RectF rectF = new RectF(rect);
-                    
-                    //canvas.drawRoundRect(rectF, 40, 40, mPlacePaint);
-                    
-                    drawEvent(canvas, fx, "helloWorld", "helloWorld", "helloWorld", place.getCreatorPicture(), mPaint);
+                    Rect rect = new Rect(fx,fy,fx+560,fy+320);
+                    RectF rectF = new RectF(rect);
+                    canvas.drawRoundRect(rectF, 40, 40, eventBackgroundPaint);     
+                    drawEvent(canvas, fx, fy, "helloWorld", "helloWorld", "helloWorld", place.getCreatorPicture(), eventTextPaint);
                 }
-            }
         }
     }
 
@@ -215,74 +153,13 @@ public class ARView extends View {
     private static final double vertical_ratio = 0.5;
     private static final double horizontal_ratio = 0.8;
     
-    private void drawEvent(Canvas canvas, int offset, String textUpperRight, String textLowerLeft,
-    					   String textLowerRight, Bitmap profile_picture, Paint paint) {
-         //canvas.drawPaint(paint);
-    	  paint = new TextPaint();
-    	  paint.setStyle(Paint.Style.FILL);
-    	  paint.setAntiAlias(true);
-    	  paint.setColor(Color.WHITE);
-    	  paint.setTextSize(PLACE_TEXT_HEIGHT);
-    	  paint.setTypeface(Typeface.createFromFile(new File("/system/glass_fonts",
-                  "Roboto-Light.ttf")));
-          
-//        TextView upperRightView = new TextView(mcontext);
-//        TextView lowerRightView = new TextView(mcontext);
-//        TextView lowerLeftView = new TextView(mcontext);
-//        ImageView imageView = new ImageView(mcontext);
-//        
-//
-//        imageView.setImageBitmap(profile_picture);
-//        upperRightView.setText(textUpperRight);
-//        lowerRightView.setText(textLowerRight);
-//        lowerLeftView.setText(textLowerLeft);
-//        
-//        upperRightView.setDrawingCacheEnabled(true);
-//        lowerRightView.setDrawingCacheEnabled(true);
-//        lowerLeftView.setDrawingCacheEnabled(true);
-//        imageView.setDrawingCacheEnabled(true);
-//        
-//        upperRightView.setTextColor(Color.BLACK);
-//        upperRightView.setBackgroundColor(Color.WHITE);
-//        lowerRightView.setTextColor(Color.BLACK);
-//        lowerRightView.setBackgroundColor(Color.WHITE);
-//        lowerLeftView.setTextColor(Color.BLACK);
-//        lowerLeftView.setBackgroundColor(Color.WHITE);
-        
-        canvas.drawText(textUpperRight,(float) (offset+560 *(1-vertical_ratio)), 0,paint);
-        canvas.drawText(textLowerRight,(float) (offset+560 *(1-vertical_ratio)), (float) (320 * (1-horizontal_ratio)),paint);
-        canvas.drawText(textLowerLeft,offset,(float) (320 * (1-horizontal_ratio)), paint);
-        
-        		
-//        upperRightView.measure(MeasureSpec.makeMeasureSpec((int) (560*(1-vertical_ratio)), MeasureSpec.EXACTLY),
-//       		 MeasureSpec.makeMeasureSpec((int) (320*(horizontal_ratio)), MeasureSpec.EXACTLY));
-//        lowerRightView.measure(MeasureSpec.makeMeasureSpec((int) (560*(1-vertical_ratio)), MeasureSpec.EXACTLY),
-//       		 MeasureSpec.makeMeasureSpec((int) (320*(horizontal_ratio)), MeasureSpec.EXACTLY));
-//        lowerLeftView.measure(MeasureSpec.makeMeasureSpec((int) (560*(vertical_ratio)), MeasureSpec.EXACTLY),
-//       		 MeasureSpec.makeMeasureSpec((int) (320*(1-horizontal_ratio)), MeasureSpec.EXACTLY));
-//        imageView.measure(MeasureSpec.makeMeasureSpec((int) (560*(vertical_ratio)), MeasureSpec.EXACTLY),
-//       		 MeasureSpec.makeMeasureSpec((int) (320*(horizontal_ratio)), MeasureSpec.EXACTLY));
-//        upperRightView.setGravity(0x10);
-//
-//        
-//        upperRightView.layout((int)(rightOffset+560*vertical_ratio),0,560+rightOffset,(int)(320*horizontal_ratio));
-//        lowerRightView.layout((int)(rightOffset+560*vertical_ratio),(int)(320*horizontal_ratio),560+rightOffset,320);
-//        lowerLeftView.layout((int)rightOffset,(int)(320*horizontal_ratio),(int)(rightOffset+560*vertical_ratio),320);             
-//        imageView.layout(rightOffset,0,(int)(rightOffset+560*vertical_ratio),(int)(320*horizontal_ratio));
-
+    private void drawEvent(Canvas canvas, int offsetX, int offsetY, String textUpperRight, String textLowerLeft,
+    					   String textLowerRight, Bitmap profile_picture, Paint eventTextPaint) {
+        canvas.drawText(textUpperRight,(float) (offsetX+560 *(1-vertical_ratio)), offsetY,eventTextPaint);
+        canvas.drawText(textLowerRight,(float) (offsetX+560 *(1-vertical_ratio)), (float) (320 * (1-horizontal_ratio) + offsetY),eventTextPaint);
+        canvas.drawText(textLowerLeft,offsetX,(float) (320 * (1-horizontal_ratio) + offsetY), eventTextPaint);
         // draw the bitmap from the drawingcache to the canvas
-//        canvas.drawBitmap(upperRightView.getDrawingCache(), (float) (rightOffset+560*vertical_ratio), 0, paint);
-//        canvas.drawBitmap(lowerRightView.getDrawingCache(), (float) (rightOffset+560*vertical_ratio),
-//       		 (float) (320*horizontal_ratio), paint);
-//        canvas.drawBitmap(lowerLeftView.getDrawingCache(), rightOffset,  (float) (320*horizontal_ratio), paint);
-        //canvas.drawBitmap(imageView.getDrawingCache(), rightOffset, 0, paint);
-
-
-        // disable drawing cache
-//        upperRightView.setDrawingCacheEnabled(false);
-//        lowerRightView.setDrawingCacheEnabled(false);
-//        lowerLeftView.setDrawingCacheEnabled(false);
-//        imageView.setDrawingCacheEnabled(false);
+        canvas.drawBitmap(profile_picture, offsetX+EVENT_PICTURE_OFFSETX, offsetY+EVENT_PICTURE_OFFSETY, eventTextPaint);
     }
 
    
@@ -309,17 +186,22 @@ public class ARView extends View {
         });
     }
 
-    /**
-     * Animates the view to the specified heading, or simply redraws it immediately if the
-     * difference between the current heading and new heading are small enough that it wouldn't be
-     * noticeable.
-     *
-     * @param end the desired heading
-     */
+
+    public void setOrientationManager(OrientationManager orientationManager) {
+        mOrientation = orientationManager;
+    }
+
+    public float getHeading() {
+        return mHeading;
+    }
+
+ 
+    public void setHeading(float degrees) {
+        mHeading = Utils.mod(degrees, 360.0f);
+        animateTo(mHeading);
+    }
+    
     private void animateTo(float end) {
-        // Only act if the animator is not currently running. If the user's orientation changes
-        // while the animator is running, we wait until the end of the animation to update the
-        // display again, to prevent jerkiness.
         if (!mAnimator.isRunning()) {
             float start = mAnimatedHeading;
             float distance = Math.abs(end - start);

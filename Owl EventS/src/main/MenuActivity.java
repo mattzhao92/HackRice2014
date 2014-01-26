@@ -93,7 +93,7 @@ public class MenuActivity extends Activity {
                 //mCompassService.readHeadingAloud();
                 return true;
             case R.id.stop:
-                stopService(new Intent(this, EventService.class));
+                //stopService(new Intent(this, EventService.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
