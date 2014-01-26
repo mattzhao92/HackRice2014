@@ -38,6 +38,8 @@ public class MenuActivity extends Activity {
 
     private EventService.CompassBinder mCompassService;
     private boolean mResumed;
+    private String currentEventId;
+    private String currentEventName;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -83,6 +85,9 @@ public class MenuActivity extends Activity {
             unbindService(mConnection);
             finish();
     		return;
+    	} else {
+    		currentEventId = ARView.eventInSight.getId();
+    		currentEventName = ARView.eventInSight.getName();
     	}
         if (mResumed && mCompassService != null && ARView.eventInSight != null) {
             super.openOptionsMenu();
@@ -115,10 +120,10 @@ public class MenuActivity extends Activity {
                 return true;
             case R.id.upload_snapshot:
             	Intent it = new Intent(MenuActivity.this, CameraActivity.class);
-//            	Bundle bundle = new Bundle();
-//            	bundle.putString("eventId", eventInSight.getId());
-//            	bundle.putString("eventName", eventInSight.getName());
-//            	it.putExtras(bundle);
+            	Bundle bundle = new Bundle();
+            	bundle.putString("eventId", currentEventId);
+            	bundle.putString("eventName", currentEventName);
+            	it.putExtras(bundle);
             	startActivity(it);
             	return true;
             case R.id.stop:
@@ -132,6 +137,8 @@ public class MenuActivity extends Activity {
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);
+        currentEventId = null;
+        currentEventName = null;
         unbindService(mConnection);
         finish();
     }

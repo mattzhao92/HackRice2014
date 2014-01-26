@@ -9,7 +9,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import lib.EventFetcher;
-import location.Event;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,12 +28,12 @@ public class CameraActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Bundle bundle = getIntent().getExtras();
-//        eventId = bundle.getString("eventId");
-//        eventName = bundle.getString("eventName") + ".jpg";
-        Event event = ARView.eventInSight;
-        eventId = event.getId();
-        eventName = event.getName() + ".jpg";
+        Bundle bundle = getIntent().getExtras();
+        eventId = bundle.getString("eventId");
+        eventName = bundle.getString("eventName") + ".jpg";
+//        Event event = ARView.eventInSight;
+//        eventId = event.getId();
+//        eventName = event.getName() + ".jpg";
         takePicture();
     }
     
@@ -73,12 +72,10 @@ public class CameraActivity extends Activity {
 						bytes.length);
 				Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 480, 320, true);
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				resizedBitmap.compress(Bitmap.CompressFormat.PNG, 80, stream);
+				resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 				byte[] byteArray = stream.toByteArray();
 				System.out.println("Resized pic byte " + byteArray.length);
-	        	fis.read(byteArray);
-	        	//System.out.println("Save event for id " + eventId + " name " + eventName);
-	        	fetcher.uploadGalleryPicture(eventId, bytes, eventName);
+	        	fetcher.uploadGalleryPicture(eventId, byteArray, eventName);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
