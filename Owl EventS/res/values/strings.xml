@@ -36,6 +36,7 @@
     <!-- Menu item strings. -->
     <string name="view_summary">View Summary</string>
     <string name="view_gallery">View Gallery</string>
+    <string name="upload_snapshot">Upload Snapshot</string>
     <string name="say_review"> Say a Review </string>
     <string name="give_direction"> Give Driection </string>
     <string name="share_google_plus"> Share on Google+ </string>

@@ -25,12 +25,13 @@ public final class R {
     }
     public static final class id {
         public static final int compass=0x7f0b0000;
-        public static final int give_direction=0x7f0b0006;
-        public static final int say_review=0x7f0b0005;
-        public static final int share_google_plus=0x7f0b0007;
-        public static final int stop=0x7f0b0008;
+        public static final int give_direction=0x7f0b0007;
+        public static final int say_review=0x7f0b0006;
+        public static final int share_google_plus=0x7f0b0008;
+        public static final int stop=0x7f0b0009;
         public static final int tips_container=0x7f0b0001;
         public static final int tips_view=0x7f0b0002;
+        public static final int upload_snapshot=0x7f0b0005;
         public static final int view_gallery=0x7f0b0004;
         public static final int view_summary=0x7f0b0003;
     }
@@ -47,20 +48,21 @@ public final class R {
         /**  Launch-related strings. 
          */
         public static final int app_name=0x7f070000;
-        public static final int give_direction=0x7f07000a;
+        public static final int give_direction=0x7f07000b;
         public static final int magnetic_interference=0x7f070006;
         /**  Warning messages. 
          */
         public static final int pitch_too_steep=0x7f070005;
         public static final int place_text_format=0x7f070004;
-        public static final int say_review=0x7f070009;
-        public static final int share_google_plus=0x7f07000b;
+        public static final int say_review=0x7f07000a;
+        public static final int share_google_plus=0x7f07000c;
         public static final int show_compass_voice_trigger=0x7f070001;
         /**  Spoken strings. 
          */
         public static final int spoken_heading_format=0x7f070002;
         public static final int spoken_heading_format_one=0x7f070003;
-        public static final int stop=0x7f07000c;
+        public static final int stop=0x7f07000d;
+        public static final int upload_snapshot=0x7f070009;
         public static final int view_gallery=0x7f070008;
         /**  Menu item strings. 
          */

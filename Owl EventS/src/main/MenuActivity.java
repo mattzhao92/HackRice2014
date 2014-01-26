@@ -16,8 +16,6 @@
 
 package main;
 
-import com.google.android.glass.sample.compass.R;
-import com.parse.Parse;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -27,6 +25,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.android.glass.sample.compass.R;
+import com.parse.Parse;
 
 /**
  * This activity manages the options menu that appears when the user taps on the compass's live
@@ -63,6 +64,7 @@ public class MenuActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        System.out.println("coa ni ma");
         mResumed = true;
         openOptionsMenu();
     }
@@ -96,6 +98,15 @@ public class MenuActivity extends Activity {
             	Intent intent = new Intent(MenuActivity.this, CardScrollActivity.class);
             	startActivity(intent);
                 return true;
+            case R.id.upload_snapshot:
+            	Intent it = new Intent(MenuActivity.this, CameraActivity.class);
+            	Bundle bundle = new Bundle();
+            	// TODO
+            	bundle.putString("eventId", "omFao4nmfv");
+            	bundle.putString("eventName", "CS Club");
+            	startActivity(it.putExtras(bundle));
+//            	takePicture();
+            	return true;
             case R.id.stop:
                 //stopService(new Intent(this, EventService.class));
                 return true;
@@ -110,4 +121,5 @@ public class MenuActivity extends Activity {
         unbindService(mConnection);
         finish();
     }
+
 }

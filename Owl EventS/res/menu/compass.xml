@@ -27,6 +27,10 @@
         android:title="@string/view_gallery"
         android:icon="@drawable/ic_read_aloud"/>
     
+    <item
+        android:id="@+id/upload_snapshot"
+        android:title="@string/upload_snapshot"
+        android:icon="@drawable/ic_read_aloud"/>
     
     <item
         android:id="@+id/say_review"

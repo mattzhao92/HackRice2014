@@ -138,9 +138,7 @@ public class EventFetcher {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	
 		}
-		
 	}
 		
 }
