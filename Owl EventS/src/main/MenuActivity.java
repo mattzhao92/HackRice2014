@@ -86,6 +86,7 @@ public class MenuActivity extends Activity {
             finish();
     		return;
     	} else {
+    		System.out.println("Lock!!!!!");
     		currentEventId = ARView.eventInSight.getId();
     		currentEventName = ARView.eventInSight.getName();
     	}
