@@ -17,7 +17,6 @@
 package main;
 
 
-import location.Event;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -65,7 +64,6 @@ public class MenuActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("coa ni ma");
         mResumed = true;
         openOptionsMenu();
     }
@@ -78,6 +76,13 @@ public class MenuActivity extends Activity {
 
     @Override
     public void openOptionsMenu() {
+    	if (ARView.eventInSight == null) {
+    		super.closeOptionsMenu();
+    		closeOptionsMenu();
+            unbindService(mConnection);
+            finish();
+    		return;
+    	}
         if (mResumed && mCompassService != null && ARView.eventInSight != null) {
             super.openOptionsMenu();
         }

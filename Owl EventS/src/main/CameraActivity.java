@@ -1,5 +1,6 @@
 package main;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +12,8 @@ import lib.EventFetcher;
 import location.Event;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -59,13 +62,21 @@ public class CameraActivity extends Activity {
         final File pictureFile = new File(picturePath);
         if (pictureFile.exists()) {
             // The picture is ready; process it.
-        	//System.out.println("File is ready");
+        	System.out.println("File is ready");
         	EventFetcher fetcher = new EventFetcher(getApplicationContext());
         	FileInputStream fis;
 			try {
 				fis = new FileInputStream(pictureFile);
 				byte[] bytes = new byte[(int) pictureFile.length()];
-	        	fis.read(bytes);
+				fis.read(bytes);
+				Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0,
+						bytes.length);
+				Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 640, 480, true);
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				resizedBitmap.compress(Bitmap.CompressFormat.PNG, 80, stream);
+				byte[] byteArray = stream.toByteArray();
+				System.out.println("Resized pic byte " + byteArray.length);
+	        	fis.read(byteArray);
 	        	//System.out.println("Save event for id " + eventId + " name " + eventName);
 	        	fetcher.uploadGalleryPicture(eventId, bytes, eventName);
 			} catch (FileNotFoundException e) {
@@ -75,6 +86,7 @@ public class CameraActivity extends Activity {
 			}
         
         } else {
+        	System.out.println("File is ready??");
         	Timer timer = new Timer();
         	timer.schedule(new TimerTask() {
 				
