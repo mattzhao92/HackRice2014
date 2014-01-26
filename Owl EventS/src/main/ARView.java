@@ -188,7 +188,7 @@ public class ARView extends View {
         int      yoffset    = 0;
         System.out.println("INPUT_STRING "+str+"\n");
         String[] lines      = str.split("\\$");
- 
+
         paint.getTextBounds("Ig", 0, 2, mBounds);
         lineHeight = (int) ((float) mBounds.height() * 1.2);
         
