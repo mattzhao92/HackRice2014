@@ -110,7 +110,7 @@ public class ARView extends View {
 	protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
     	canvas.save();
-        if (!eventsLoaded) {
+        if (eventsLoaded) {
         	float pixelsPerCard = getWidth() / 30.0f;
         	float centerX = getWidth() / 2.0f;
         	float centerY = getHeight() / 2.0f;
