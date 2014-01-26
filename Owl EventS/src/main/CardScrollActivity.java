@@ -1,9 +1,9 @@
 package main;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import lib.EventFetcher;
 import location.Event;
 import android.app.Activity;
 import android.net.Uri;
@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.glass.app.Card;
-import com.google.android.glass.sample.compass.R;
 import com.google.android.glass.widget.CardScrollAdapter;
 import com.google.android.glass.widget.CardScrollView;
 
@@ -40,41 +39,40 @@ public class CardScrollActivity extends Activity {
         List<Event> events = ARView.owlevents;
 
         Card card;
-        EventFetcher ef = new EventFetcher(getApplicationContext());
         for (Event event : events) {
         	List<String> photos = event.getGallery();
         	if (!photos.isEmpty()) {
         		for (String photo : photos) {
         			card = new Card(this);
         			card.setImageLayout(Card.ImageLayout.FULL);
-        			System.out.println(photo);
-        			ef.getFile(photo);
+        			File file = new File(getApplicationContext().getFilesDir(), photo);
+        			card.addImage(Uri.parse(file.toURI().toString()));
         			mCards.add(card);
         		}
         		break;
         	} 
         }
-        
-        card = new Card(this);
-        card.setText("This card has a footer.");
-        card.setFootnote("I'm the footer!");
-        mCards.add(card);
-
-        card = new Card(this);
-        card.setText("This card has a puppy background image.");
-        card.setFootnote("How can you resist?");
-        card.setImageLayout(Card.ImageLayout.FULL);
-        card.addImage(R.drawable.ic_stop);
-        mCards.add(card);
-
-        card = new Card(this);
-        card.setText("This card has a mosaic of puppies.");
-        card.setFootnote("Aren't they precious?");
-        card.setImageLayout(Card.ImageLayout.LEFT);
-        card.addImage(R.drawable.ic_stop);
-        card.addImage(R.drawable.ic_stop);
-        card.addImage(R.drawable.ic_stop);
-        mCards.add(card);
+//        
+//        card = new Card(this);
+//        card.setText("This card has a footer.");
+//        card.setFootnote("I'm the footer!");
+//        mCards.add(card);
+//
+//        card = new Card(this);
+//        card.setText("This card has a puppy background image.");
+//        card.setFootnote("How can you resist?");
+//        card.setImageLayout(Card.ImageLayout.FULL);
+//        card.addImage(R.drawable.ic_stop);
+//        mCards.add(card);
+//
+//        card = new Card(this);
+//        card.setText("This card has a mosaic of puppies.");
+//        card.setFootnote("Aren't they precious?");
+//        card.setImageLayout(Card.ImageLayout.LEFT);
+//        card.addImage(R.drawable.ic_stop);
+//        card.addImage(R.drawable.ic_stop);
+//        card.addImage(R.drawable.ic_stop);
+//        mCards.add(card);
     }
 
     private class GalleryCardScrollAdapter extends CardScrollAdapter {

@@ -51,7 +51,7 @@ public class EventFetcher {
 					creator.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
 						@Override
 						public void done(ParseObject object, ParseException e) {
-							System.out.println(creator.getString(CREATOR_NAME));
+//							System.out.println(creator.getString(CREATOR_NAME));
 							// Download the profile picture.
 							ParseFile pic = creator
 									.getParseFile(CREATOR_PICTURE);
@@ -127,32 +127,20 @@ public class EventFetcher {
 	}
 
 	public void saveFile(String filename, byte[] file) {
-		System.out.println("Save " + filename);
 		File f = new File(context.getFilesDir(), filename);
 		if (!f.exists()) {
 			FileOutputStream outputStream;
 			try {
+				System.out.println("Save " + filename);
 				outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
 				outputStream.write(file);
 				outputStream.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-	}
 	
-	public void getFile(String filename) {
-//		try {
-//			context.openFileOutput(filename, Context.MODE_PRIVATE);
-			File f = new File(context.getFilesDir(), filename);
-			if (!f.exists()) {
-				System.out.println("no");
-			} else {
-				System.out.println("Yes");
-			}
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		}
+		}
 		
 	}
+		
 }
