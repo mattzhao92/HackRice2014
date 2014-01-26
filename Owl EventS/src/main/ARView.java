@@ -205,9 +205,9 @@ public class ARView extends View {
     					   String textLowerRight, Bitmap profile_picture, Paint eventTextPaint) {
     	
     	
-        canvas.drawText(textUpperRight,(float) (offsetX+560 *(1-vertical_ratio)), offsetY,eventTextPaint);
-        canvas.drawText(textLowerRight,(float) (offsetX+560 *(1-vertical_ratio)), (float) (320 * (1-horizontal_ratio) + offsetY),eventTextPaint);
-        canvas.drawText(textLowerLeft,offsetX,(float) (320 * (1-horizontal_ratio) + offsetY), eventTextPaint);
+        canvas.drawText(textUpperRight,(float) (offsetX+560 *(1-vertical_ratio)), (int)(320 * (1-horizontal_ratio)) + offsetY,eventTextPaint);
+        canvas.drawText(textLowerRight,(float) (offsetX+560 *(1-vertical_ratio)), (int)(320 * (horizontal_ratio)) + offsetY,eventTextPaint);
+        canvas.drawText(textLowerLeft,offsetX,(int) (320 * (horizontal_ratio) + offsetY), eventTextPaint);
         // draw the bitmap from the drawingcache to the canvas
         canvas.drawBitmap(profile_picture, offsetX+EVENT_PICTURE_OFFSETX, offsetY+EVENT_PICTURE_OFFSETY, eventTextPaint);
     }

@@ -90,10 +90,10 @@ public class EventFetcher {
 		try {
 			List<ParseObject> gallery = galleryQuery.find();
 			for (ParseObject photo : gallery) {
-				System.out.println("Saveeee");
 				ParseFile photoFile = photo.getParseFile(GALLERY_PHOTO);
 				byte[] fileByte = photoFile.getData();
 				String name = photoFile.getName();
+				System.out.println("Saveeee " + name);
 				if (fileByte != null) {
 					saveFile(name, fileByte);
 					photos.add(name);
