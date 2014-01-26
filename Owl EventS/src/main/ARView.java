@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2013 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package main;
 
 
@@ -26,12 +10,11 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
 
 import lib.EventFetcher;
 import lib.Utils;
@@ -45,8 +28,8 @@ public class ARView extends View {
 	private static final int NUMBER_EMPTY_CARDS = 12;
 	private static final float EVENT_PICTURE_OFFSETX = 560/20;
 	private static final float EVENT_PICTURE_OFFSETY = 320/20;
-    private static final float PLACE_TEXT_HEIGHT = 22.0f;
-    private static final float PLACE_PIN_WIDTH = 14.0f;
+    private static final float EVENT_TEXT_SIZE = 22.0f;
+    private static final float LOADING_TEXT_SIZE = 50.0f;
     private static final double vertical_ratio = 0.5;
     private static final double horizontal_ratio = 0.8;
 
@@ -58,11 +41,13 @@ public class ARView extends View {
 
     private float mHeading;
     private float mAnimatedHeading;
+    private final TextPaint loadingTextPaint;
     private final TextPaint eventTextPaint;
     private final TextPaint eventBackgroundPaint;
     private final ValueAnimator mAnimator;
     private EventFetcher eventFetcher;
     private OrientationManager mOrientation;
+    private boolean eventsLoaded = false;
     public static List<Event> owlevents;
     public static Event eventInSight = null;
 
@@ -82,26 +67,40 @@ public class ARView extends View {
 
         owlevents = new ArrayList<Event>();
 
+        loadingTextPaint = new TextPaint();
+        loadingTextPaint.setStyle(Paint.Style.FILL);
+        loadingTextPaint.setAntiAlias(true);
+        loadingTextPaint.setColor(Color.WHITE);
+        loadingTextPaint.setTextSize(LOADING_TEXT_SIZE);
+        
         eventTextPaint = new TextPaint();
         eventTextPaint.setStyle(Paint.Style.FILL);
         eventTextPaint.setAntiAlias(true);
         eventTextPaint.setColor(Color.BLACK);
-        eventTextPaint.setTextSize(PLACE_TEXT_HEIGHT);
+        eventTextPaint.setTextSize(EVENT_TEXT_SIZE);
         
         eventBackgroundPaint  = new TextPaint();
         eventBackgroundPaint.setStyle(Paint.Style.FILL);
         eventBackgroundPaint.setAntiAlias(true);
         eventBackgroundPaint.setColor(Color.WHITE);
+        eventsLoaded = false;
         mAnimatedHeading = Float.NaN;
 
         mAnimator = new ValueAnimator();
         eventFetcher = new EventFetcher(context);
-        eventFetcher.getAllEvents(owlevents);
+        
+        GetCallback<ParseObject> onEventDataLoadedCallback = new GetCallback<ParseObject>() {
+			@Override
+			public void done(ParseObject object, ParseException e) {
+				eventsLoaded = true;
+			}
+		};
+        eventFetcher.getAllEvents(owlevents, onEventDataLoadedCallback);
         timer.schedule(new TimerTask() {
 			
  			@Override
  			public void run() {
- 				eventFetcher.getAllEvents(owlevents);
+ 				eventFetcher.getAllEvents(owlevents, null);
  			}
  		}, 1000, 25000);
         setupAnimator();
@@ -110,24 +109,27 @@ public class ARView extends View {
     @Override
 	protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+    	canvas.save();
+        if (eventsLoaded) {
+        	float pixelsPerCard = getWidth() / 30.0f;
+        	float centerX = getWidth() / 2.0f;
+        	float centerY = getHeight() / 2.0f;
 
-        // The view displays 90 degrees across its width so that one 90 degree head rotation is
-        // equal to one full view cycle.
-        float pixelsPerCard = getWidth() / 30.0f;
-        float centerX = getWidth() / 2.0f;
-        float centerY = getHeight() / 2.0f;
-
-        canvas.save();
-        canvas.translate(-mAnimatedHeading * pixelsPerCard + centerX, centerY);
-        
-        drawEmptyCards(canvas, pixelsPerCard);
-        
-        for (int i = -1; i <= 1; i++) {
-            drawEvents(canvas, pixelsPerCard, i * pixelsPerCard * 360);
+        	canvas.translate(-mAnimatedHeading * pixelsPerCard + centerX, centerY);
+        	drawEmptyCards(canvas, pixelsPerCard);
+        	for (int i = -1; i <= 1; i++) {
+        		drawEvents(canvas, pixelsPerCard, i * pixelsPerCard * 360);
+        	}
+        } else {
+        	drawLoading(canvas);
         }
-        canvas.restore();
+    	canvas.restore();       
     }
     
+    
+    private void drawLoading(Canvas canvas) {
+    	canvas.drawText("Loading ...", 100, 200, loadingTextPaint);
+    }
     
     private void drawEmptyCards(Canvas canvas, float pixelsPerCard) {
     	
@@ -189,7 +191,7 @@ public class ARView extends View {
                             longitude2);
 
                     int fx = (int) (offset + Math.floor(angle/30) * 30 * pixelsPerCard
-                            - PLACE_PIN_WIDTH / 2);
+                            - 14 / 2);
                     int fy = -320/2;
                     
                     //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);    
