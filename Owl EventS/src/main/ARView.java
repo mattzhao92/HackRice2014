@@ -18,7 +18,6 @@ package main;
 
 
 import android.animation.*;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.graphics.*;
@@ -29,6 +28,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,11 +41,14 @@ import location.Event;
 
 public class ARView extends View {
 
-
+	private static final int CARD_FRAME_OFFSET = 10;
+	private static final int NUMBER_EMPTY_CARDS = 12;
 	private static final float EVENT_PICTURE_OFFSETX = 560/20;
 	private static final float EVENT_PICTURE_OFFSETY = 320/20;
     private static final float PLACE_TEXT_HEIGHT = 22.0f;
     private static final float PLACE_PIN_WIDTH = 14.0f;
+    private static final double vertical_ratio = 0.5;
+    private static final double horizontal_ratio = 0.8;
 
     /**
      * If the difference between two consecutive headings is less than this value, the canvas will
@@ -61,6 +64,7 @@ public class ARView extends View {
     private EventFetcher eventFetcher;
     private OrientationManager mOrientation;
     public static List<Event> owlevents;
+    public static Event eventInSight = null;
 
 
     private Timer timer = new Timer();
@@ -108,22 +112,69 @@ public class ARView extends View {
 
         // The view displays 90 degrees across its width so that one 90 degree head rotation is
         // equal to one full view cycle.
-        float pixelsPerDegree = getWidth() / 90.0f;
+        float pixelsPerCard = getWidth() / 30.0f;
         float centerX = getWidth() / 2.0f;
         float centerY = getHeight() / 2.0f;
 
         canvas.save();
-        canvas.translate(-mAnimatedHeading * pixelsPerDegree + centerX, centerY);
-
+        canvas.translate(-mAnimatedHeading * pixelsPerCard + centerX, centerY);
+        
+        drawEmptyCards(canvas, pixelsPerCard);
+        
         for (int i = -1; i <= 1; i++) {
-            drawEvents(canvas, pixelsPerDegree, i * pixelsPerDegree * 360);
+            drawEvents(canvas, pixelsPerCard, i * pixelsPerCard * 360);
         }
-
         canvas.restore();
     }
     
-  
-    private void drawEvents(Canvas canvas, float pixelsPerDegree, float offset) {
+    
+    private void drawEmptyCards(Canvas canvas, float pixelsPerCard) {
+    	
+    	float degreesPerCard = 360 / NUMBER_EMPTY_CARDS;
+    	
+    	Boolean [] non_alpha = new Boolean [NUMBER_EMPTY_CARDS];
+    	Event   [] event_map = new Event [NUMBER_EMPTY_CARDS];
+    	Arrays.fill(non_alpha, true);
+    	Arrays.fill(event_map, null);
+    	
+    	Location userLocation = mOrientation.getLocation();
+        double latitude1 = userLocation.getLatitude();
+        double longitude1 = userLocation.getLongitude();
+        
+        ArrayList<Event> eventsCopy = new ArrayList<Event>(owlevents);
+        for (Event event : eventsCopy) {
+            double latitude2 = event.getLatitude();
+            double longitude2 = event.getLongitude();
+            float angle = Utils.getBearing(latitude1, longitude1, latitude2,
+                    longitude2);
+            non_alpha[(int)Math.floor(angle/30)] = false;
+            event_map[(int)Math.floor(angle/30)] = event;
+        }
+        
+        int card_index = (int)Math.floor(mAnimatedHeading/30);
+        if (non_alpha[card_index]) {
+        	this.eventInSight = null;
+        } else {
+        	this.eventInSight = event_map[card_index];
+        }
+    	
+    	for (int i = -2; i < NUMBER_EMPTY_CARDS + 3; i++) {
+    		int fx = (int) (i * degreesPerCard * pixelsPerCard);
+    		int fy = -320/2;
+            Rect rect = new Rect(fx + CARD_FRAME_OFFSET/2,fy, (int) (fx+ degreesPerCard * pixelsPerCard) - CARD_FRAME_OFFSET/2, fy+320);
+            RectF rectF = new RectF(rect);
+
+            if (non_alpha[(12+i) % 12]) {
+                eventBackgroundPaint.setAlpha(30);	
+            } else {
+                eventBackgroundPaint.setAlpha(90);
+            }
+            
+            canvas.drawRoundRect(rectF, 40, 40, eventBackgroundPaint); 
+    	}
+    }
+    
+    private void drawEvents(Canvas canvas, float pixelsPerCard, float offset) {
         if (mOrientation.hasLocation() && owlevents != null) {
                 Location userLocation = mOrientation.getLocation();
                 double latitude1 = userLocation.getLatitude();
@@ -133,28 +184,24 @@ public class ARView extends View {
                 for (Event place : eventsCopy) {
                     double latitude2 = place.getLatitude();
                     double longitude2 = place.getLongitude();
-                    float bearing = Utils.getBearing(latitude1, longitude1, latitude2,
+                    float angle = Utils.getBearing(latitude1, longitude1, latitude2,
                             longitude2);
 
-                    int fx = (int) (offset + bearing * pixelsPerDegree
+                    int fx = (int) (offset + Math.floor(angle/30) * 30 * pixelsPerCard
                             - PLACE_PIN_WIDTH / 2);
                     int fy = -320/2;
                     
-                    //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);
-                    Rect rect = new Rect(fx,fy,fx+560,fy+320);
-                    RectF rectF = new RectF(rect);
-                    canvas.drawRoundRect(rectF, 40, 40, eventBackgroundPaint);     
+                    //System.out.println("Place "+place_index++ + " fx: "+fx+" fy: "+ fy);    
                     drawEvent(canvas, fx, fy, "helloWorld", "helloWorld", "helloWorld", place.getCreatorPicture(), eventTextPaint);
                 }
         }
     }
-
     
-    private static final double vertical_ratio = 0.5;
-    private static final double horizontal_ratio = 0.8;
-    
-    private void drawEvent(Canvas canvas, int offsetX, int offsetY, String textUpperRight, String textLowerLeft,
+    private void drawEvent(Canvas canvas, int offsetX, int offsetY, 
+    					   String textUpperRight, String textLowerLeft,
     					   String textLowerRight, Bitmap profile_picture, Paint eventTextPaint) {
+    	
+    	
         canvas.drawText(textUpperRight,(float) (offsetX+560 *(1-vertical_ratio)), offsetY,eventTextPaint);
         canvas.drawText(textLowerRight,(float) (offsetX+560 *(1-vertical_ratio)), (float) (320 * (1-horizontal_ratio) + offsetY),eventTextPaint);
         canvas.drawText(textLowerLeft,offsetX,(float) (320 * (1-horizontal_ratio) + offsetY), eventTextPaint);

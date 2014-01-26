@@ -52,17 +52,16 @@ public class CameraActivity extends Activity {
     
     private void processPictureWhenReady(final String picturePath) {
         final File pictureFile = new File(picturePath);
-        System.out.println("File is ready???" + picturePath);
         if (pictureFile.exists()) {
             // The picture is ready; process it.
-        	System.out.println("File is ready");
+        	//System.out.println("File is ready");
         	EventFetcher fetcher = new EventFetcher(getApplicationContext());
         	FileInputStream fis;
 			try {
 				fis = new FileInputStream(pictureFile);
 				byte[] bytes = new byte[(int) pictureFile.length()];
 	        	fis.read(bytes);
-	        	System.out.println("Save event for id " + eventId + " name " + eventName);
+	        	//System.out.println("Save event for id " + eventId + " name " + eventName);
 	        	fetcher.uploadGalleryPicture(eventId, bytes, eventName);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -71,12 +70,6 @@ public class CameraActivity extends Activity {
 			}
         
         } else {
-            // The file does not exist yet. Before starting the file observer, you
-            // can update your UI to let the user know that the application is
-            // waiting for the picture (for example, by displaying the thumbnail
-            // image and a progress indicator).
-        	System.out.println("Not ready");
-        	
         	Timer timer = new Timer();
         	timer.schedule(new TimerTask() {
 				
